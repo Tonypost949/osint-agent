@@ -63,21 +63,35 @@ def send_image_email():
         print(f"[!] Failed to download image: {e}")
         return
 
+    from google.auth.transport.requests import Request
     # Authenticate
     creds = None
     if os.path.exists(TOKEN_FILE):
         creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
     if not creds or not creds.valid:
-        print("[!] Invalid token. Please authorize.")
-        return
+        if creds and creds.expired and creds.refresh_token:
+            try:
+                creds.refresh(Request())
+                with open(TOKEN_FILE, 'w') as token:
+                    token.write(creds.to_json())
+            except Exception as e:
+                print(f"[!] Failed to refresh token: {e}")
+                return
+        else:
+            print("[AUTH] Launching browser to authorize sending email...")
+            CLIENT_SECRET_FILE = os.path.join(SCRIPT_DIR, "client_secret.json")
+            flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
+            creds = flow.run_local_server(port=0)
+            with open(TOKEN_FILE, 'w') as token:
+                token.write(creds.to_json())
 
     try:
         print("[+] Building email with image attachment...")
         service = build('gmail', 'v1', credentials=creds)
         message = EmailMessage()
         message.set_content("Here is the visual architecture graph of the Vanguard RICO network. See attached image.")
-        message['To'] = 'amd949609@gmail.com'
-        message['From'] = 'amd949609@gmail.com'
+        message['To'] = 'txtdjdrop@gmail.com'
+        message['From'] = 'txtdjdrop@gmail.com'
         message['Subject'] = 'OSINT Zeus: Vanguard RICO Network Visual Graph'
 
         # Attach the image

@@ -32,7 +32,9 @@ def clean_large_files():
             print(f"Uploading {file_name} (Size: {size / (1024**2):.1f} MB)...")
             
             blob = bucket.blob(blob_path)
-            blob.upload_from_filename(path)
+            # Use 5MB chunk size for upload reliability and set a longer timeout
+            blob.chunk_size = 5 * 1024 * 1024
+            blob.upload_from_filename(path, timeout=600)
             
             print(f"[OK] Uploaded to gs://{BUCKET_NAME}/{blob_path}")
             

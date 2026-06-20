@@ -35,6 +35,7 @@ HTML_TEMPLATE = """
 <body>
     <div id="sidebar">
         <h2 style="color: #ff3333; text-transform: uppercase;">MAKAVELI OSINT HUB</h2>
+        <a href="http://{{IP}}:8501" target="_blank" style="background-color: #38bdf8; color: #0f172a; font-weight: bold; text-align: center; margin-bottom: 15px; text-decoration: none; display: block; padding: 10px; border-radius: 5px;">👉 OPEN AI CHAT TERMINAL</a>
         <p style="font-size: 0.8em; color: #94a3b8;">Click a file below to view it on your tablet.</p>
         <div id="file-list"></div>
     </div>
@@ -109,11 +110,24 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=BRAIN_DIR, **kwargs)
 
     def do_GET(self):
+        import socket
         if self.path == '/':
             self.send_response(200)
             self.send_header("Content-type", "text/html")
             self.end_headers()
-            self.wfile.write(HTML_TEMPLATE.encode('utf-8'))
+            
+            # Try to get local IP dynamically
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            try:
+                s.connect(('10.255.255.255', 1))
+                IP = s.getsockname()[0]
+            except Exception:
+                IP = '127.0.0.1'
+            finally:
+                s.close()
+                
+            templated_html = HTML_TEMPLATE.replace('{{IP}}', IP)
+            self.wfile.write(templated_html.encode('utf-8'))
         elif self.path == '/files.json':
             self.send_response(200)
             self.send_header("Content-type", "application/json")

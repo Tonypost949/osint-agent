@@ -8,6 +8,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+from google.auth.transport.requests import Request
 
 # ----------------------------------------------------------------------
 # -------------------------- CONFIGURATION ----------------------------
@@ -16,7 +17,7 @@ from googleapiclient.http import MediaFileUpload
 SOURCE_DIR = r"C:\Users\HP\.gemini\antigravity-ide\brain\c370d570-1fbc-427b-a511-94af4ff83ad7"
 
 # 2. Delete the local file after a successful upload? (True = move, False = copy)
-DELETE_AFTER_UPLOAD = True
+DELETE_AFTER_UPLOAD = False
 
 # 3. Scopes needed for Drive access
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]

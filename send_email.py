@@ -78,8 +78,8 @@ def send_email():
         service = build('gmail', 'v1', credentials=creds)
         message = EmailMessage()
         message.set_content(MERMAID_GRAPH)
-        message['To'] = 'amd949609@gmail.com'
-        message['From'] = 'amd949609@gmail.com'
+        message['To'] = 'txtdjdrop@gmail.com'
+        message['From'] = 'txtdjdrop@gmail.com'
         message['Subject'] = 'OSINT Zeus: Vanguard RICO Network Architecture Graph'
 
         encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()

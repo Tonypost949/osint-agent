@@ -42,8 +42,8 @@ def package_evidence():
             print(f"  -> Added: {arcname}")
 
     print("="*60)
-    print(f"[✓] Evidence successfully packaged and sealed.")
-    print(f"[✓] Archive Path: {ZIP_PATH}")
+    print(f"[+] Evidence successfully packaged and sealed.")
+    print(f"[+] Archive Path: {ZIP_PATH}")
     print("[INFO] You can now move this zip file directly to your external 500GB hard drive.")
     print("="*60)
 
