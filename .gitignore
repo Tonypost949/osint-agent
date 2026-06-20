@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.db
+*.zip
+*.jpg
+*.png
+*.json
+!osint-agent.code-workspace
+tiles_temp/
+*.log

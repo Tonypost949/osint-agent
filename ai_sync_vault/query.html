@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Stream Correlation Query</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+        }
+        body {
+            background: #0b1120;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            padding: 2rem 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: #1e293b;
+            border-radius: 20px;
+            padding: 2rem 1.8rem 2.2rem;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+            border: 1px solid #334155;
+        }
+        h1 {
+            color: #e2e8f0;
+            font-weight: 500;
+            font-size: 1.7rem;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.2rem;
+        }
+        .subtitle {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-bottom: 1.8rem;
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+        }
+        .code-block {
+            background: #0f172a;
+            border-radius: 14px;
+            padding: 1.2rem 1.5rem;
+            overflow-x: auto;
+            position: relative;
+            border: 1px solid #334155;
+        }
+        pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .keyword { color: #f472b6; }
+        .function { color: #60a5fa; }
+        .string { color: #34d399; }
+        .comment { color: #64748b; font-style: italic; }
+        .operator { color: #fbbf24; }
+        .table { color: #a78bfa; }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+            justify-content: flex-start;
+        }
+        .btn {
+            background: #334155;
+            border: none;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.6rem 1.8rem;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid #475569;
+        }
+        .btn:hover {
+            background: #475569;
+            border-color: #64748b;
+            transform: translateY(-1px);
+        }
+        .btn-primary {
+            background: #2563eb;
+            border-color: #3b82f6;
+        }
+        .btn-primary:hover {
+            background: #3b82f6;
+            border-color: #60a5fa;
+        }
+        .btn-success {
+            background: #059669;
+            border-color: #10b981;
+        }
+        .btn-success:hover {
+            background: #10b981;
+            border-color: #34d399;
+        }
+        .footer {
+            margin-top: 1.8rem;
+            color: #64748b;
+            font-size: 0.85rem;
+            border-top: 1px solid #334155;
+            padding-top: 1.2rem;
+        }
+        .footer a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #059669;
+            color: #fff;
+            padding: 0.7rem 1.8rem;
+            border-radius: 40px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        @media (max-width: 640px) {
+            .container { padding: 1.5rem; }
+            pre { font-size: 0.7rem; }
+            .btn { padding: 0.5rem 1.2rem; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Multi-Stream Correlation</h1>
+        <div class="subtitle">
+            HUD PIT · NPI (Non‑Profiteers) · Environmental ESA — cross‑referenced by state
+        </div>
+
+        <div class="code-block">
+            <pre id="queryDisplay"><span class="comment">-- MULTI-STREAM CORRELATION EXECUTION</span>
+<span class="comment">-- CROSS-REFERENCING HUD PIT MATRIX, NPI DELTAS, AND ENVIRONMENTAL ESAs</span>
+
+<span class="keyword">WITH</span> PIT_Metrics <span class="keyword">AS</span> (
+  <span class="comment">-- Stream 2: Aggregate HUD Point-in-Time Counts per State</span>
+  <span class="keyword">SELECT</span>
+    state,
+    <span class="function">SUM</span>(pit.total_homeless) <span class="keyword">AS</span> total_homeless_population,
+    <span class="function">SUM</span>(pit.sheltered_homeless) <span class="keyword">AS</span> total_sheltered,
+    <span class="function">SUM</span>(pit.unsheltered_homeless) <span class="keyword">AS</span> total_unsheltered,
+    <span class="function">MAX</span>(pit.count_year) <span class="keyword">AS</span> latest_pit_year
+  <span class="keyword">FROM</span> <span class="table">`noble-beanbag-497411-m4.national_audits.all_state_records`</span>,
+  <span class="function">UNNEST</span>(hud_pit_list) <span class="keyword">AS</span> pit
+  <span class="keyword">GROUP BY</span> state
+),
+
+NPI_Metrics <span class="keyword">AS</span> (
+  <span class="comment">-- Stream 4: Flatten corporate leakage parameters per State</span>
+  <span class="keyword">SELECT</span>
+    state,
+    <span class="function">COUNT</span>(npi.npi_id) <span class="keyword">AS</span> total_active_shell_entities,
+    <span class="function">SUM</span>(npi.unaccounted_fund_delta) <span class="keyword">AS</span> aggregate_unaccounted_leakage
+  <span class="keyword">FROM</span> <span class="table">`noble-beanbag-497411-m4.national_audits.all_state_records`</span>,
+  <span class="function">UNNEST</span>(non_profiteers_index) <span class="keyword">AS</span> npi
+  <span class="keyword">GROUP BY</span> state
+),
+
+ESA_Metrics <span class="keyword">AS</span> (
+  <span class="comment">-- Stream 5: Isolate toxic footprints per State</span>
+  <span class="keyword">SELECT</span>
+    state,
+    <span class="function">COUNT</span>(esa.site_id) <span class="keyword">AS</span> total_monitored_toxic_sites,
+    <span class="function">COUNTIF</span>(esa.test_multiplier >= 10.0) <span class="keyword">AS</span> severe_chemical_safety_breaches,
+    <span class="function">MAX</span>(<span class="keyword">CASE WHEN</span> esa.site_id = <span class="string">'ENV-HBNC-001'</span> <span class="keyword">THEN</span> esa.test_multiplier <span class="keyword">ELSE</span> <span class="keyword">NULL END</span>) <span class="keyword">AS</span> target_hbnc_crvi_multiplier
+  <span class="keyword">FROM</span> <span class="table">`noble-beanbag-497411-m4.national_audits.all_state_records`</span>,
+  <span class="function">UNNEST</span>(environmental_site_assessments) <span class="keyword">AS</span> esa
+  <span class="keyword">GROUP BY</span> state
+)
+
+<span class="keyword">SELECT</span>
+  base.state,
+  base.state_name,
+  pit.latest_pit_year,
+  pit.total_homeless_population,
+  pit.total_unsheltered,
+  npi.total_active_shell_entities,
+  npi.aggregate_unaccounted_leakage,
+  esa.total_monitored_toxic_sites,
+  esa.severe_chemical_safety_breaches,
+  esa.target_hbnc_crvi_multiplier <span class="keyword">AS</span> hbnc_toxic_excess_rate
+<span class="keyword">FROM</span> <span class="table">`noble-beanbag-497411-m4.national_audits.all_state_records`</span> <span class="keyword">AS</span> base
+<span class="keyword">LEFT JOIN</span> PIT_Metrics <span class="keyword">AS</span> pit <span class="keyword">ON</span> base.state = pit.state
+<span class="keyword">LEFT JOIN</span> NPI_Metrics <span class="keyword">AS</span> npi <span class="keyword">ON</span> base.state = npi.state
+<span class="keyword">LEFT JOIN</span> ESA_Metrics <span class="keyword">AS</span> esa <span class="keyword">ON</span> base.state = esa.state
+<span class="keyword">ORDER BY</span> npi.aggregate_unaccounted_leakage <span class="keyword">DESC</span>;</pre>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-primary" id="copyBtn">📋 Copy Query</button>
+            <button class="btn btn-success" id="runBtn">▶️ Run in BigQuery Console</button>
+            <button class="btn" id="copyBqBtn">⌨️ Copy bq Command</button>
+        </div>
+
+        <div class="footer">
+            <strong>💡 Tip:</strong> Paste the query into your BigQuery console or run via <code>bq query</code>.<br>
+            Make sure the dataset <code>noble-beanbag-497411-m4.national_audits.all_state_records</code> exists and has the required arrays populated.
+        </div>
+    </div>
+
+    <div id="toast" class="toast">✅ Copied!</div>
+
+    <script>
+        const query = `-- MULTI-STREAM CORRELATION EXECUTION
+-- CROSS-REFERENCING HUD PIT MATRIX, NPI DELTAS, AND ENVIRONMENTAL ESAs
+
+WITH PIT_Metrics AS (
+  -- Stream 2: Aggregate HUD Point-in-Time Counts per State
+  SELECT
+    state,
+    SUM(pit.total_homeless) AS total_homeless_population,
+    SUM(pit.sheltered_homeless) AS total_sheltered,
+    SUM(pit.unsheltered_homeless) AS total_unsheltered,
+    MAX(pit.count_year) AS latest_pit_year
+  FROM \`noble-beanbag-497411-m4.national_audits.all_state_records\`,
+  UNNEST(hud_pit_list) AS pit
+  GROUP BY state
+),
+
+NPI_Metrics AS (
+  -- Stream 4: Flatten corporate leakage parameters per State
+  SELECT
+    state,
+    COUNT(npi.npi_id) AS total_active_shell_entities,
+    SUM(npi.unaccounted_fund_delta) AS aggregate_unaccounted_leakage
+  FROM \`noble-beanbag-497411-m4.national_audits.all_state_records\`,
+  UNNEST(non_profiteers_index) AS npi
+  GROUP BY state
+),
+
+ESA_Metrics AS (
+  -- Stream 5: Isolate toxic footprints per State
+  SELECT
+    state,
+    COUNT(esa.site_id) AS total_monitored_toxic_sites,
+    COUNTIF(esa.test_multiplier >= 10.0) AS severe_chemical_safety_breaches,
+    MAX(CASE WHEN esa.site_id = 'ENV-HBNC-001' THEN esa.test_multiplier ELSE NULL END) AS target_hbnc_crvi_multiplier
+  FROM \`noble-beanbag-497411-m4.national_audits.all_state_records\`,
+  UNNEST(environmental_site_assessments) AS esa
+  GROUP BY state
+)
+
+SELECT
+  base.state,
+  base.state_name,
+  pit.latest_pit_year,
+  pit.total_homeless_population,
+  pit.total_unsheltered,
+  npi.total_active_shell_entities,
+  npi.aggregate_unaccounted_leakage,
+  esa.total_monitored_toxic_sites,
+  esa.severe_chemical_safety_breaches,
+  esa.target_hbnc_crvi_multiplier AS hbnc_toxic_excess_rate
+FROM \`noble-beanbag-497411-m4.national_audits.all_state_records\` AS base
+LEFT JOIN PIT_Metrics AS pit ON base.state = pit.state
+LEFT JOIN NPI_Metrics AS npi ON base.state = npi.state
+LEFT JOIN ESA_Metrics AS esa ON base.state = esa.state
+ORDER BY npi.aggregate_unaccounted_leakage DESC;`;
+
+        const bqCommand = `bq query --use_legacy_sql=false "${query.replace(/"/g, '\\"')}"`;
+
+        const toast = document.getElementById('toast');
+        function showToast(msg = '✅ Copied!') {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(query).then(() => {
+                showToast('✅ Query copied to clipboard!');
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = query;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('✅ Query copied (fallback)!');
+            });
+        });
+
+        document.getElementById('copyBqBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(bqCommand).then(() => {
+                showToast('✅ bq command copied!');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = bqCommand;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('✅ bq command copied (fallback)!');
+            });
+        });
+
+        document.getElementById('runBtn').addEventListener('click', () => {
+            // Open BigQuery console with the query pre-filled (URL encoding)
+            const encoded = encodeURIComponent(query);
+            const url = `https://console.cloud.google.com/bigquery?sq=${encoded}`;
+            window.open(url, '_blank');
+        });
+    </script>
+</body>
+</html>
