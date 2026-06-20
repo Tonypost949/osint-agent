@@ -142,7 +142,8 @@ def load_and_combine_ppp() -> pd.DataFrame:
     file_tier_1 = "public_150k_plus_240930.csv"
     file_tier_2 = "ppp_up_to_150k.csv"
 
-    combined_df = pd.DataFrame()
+    combined_df = pd.DataFrame(columns=['clean_name', 'BusinessName', 'City', 'State', 'Zip',
+                                         'LoanAmount', 'DateApproved', 'ForgivenessAmount'])
 
     for file in [file_tier_1, file_tier_2]:
         try:

@@ -12,7 +12,7 @@ A claim without an authority source is not in the matrix.
 """
 import sqlite3, os
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "master_index.db")
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "master_index_v2.db")
 
 SCHEMA_V2 = [
 # -----------------------------------------------------------------------

@@ -17,7 +17,7 @@ def analyze_pdf_directly(pdf_path):
         pdf_bytes = f.read()
         
     print("Uploading inline PDF bytes to Gemini for forensic OCR and analysis...")
-    ai_client = genai.Client(vertexai=True, project=GCP_PROJECT, location="global")
+    ai_client = genai.Client(vertexai=True, project=GCP_PROJECT, location="us-central1")
     
     prompt = """
     You are OSINTNeoAi, a forensic data auditor. Below is the full scanned PDF of the Form 990 public tax return of Mercy House Living Centers.
@@ -49,7 +49,7 @@ def analyze_pdf_directly(pdf_path):
     
     try:
         response = ai_client.models.generate_content(
-            model="gemini-3.5-flash",
+            model="gemini-1.5-flash",
             contents=[pdf_part, prompt]
         )
         res_text = response.text.replace('```json', '').replace('```', '').strip()

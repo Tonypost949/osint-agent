@@ -3,12 +3,13 @@ from pydantic import BaseModel
 from google.cloud import bigquery
 from google.cloud import storage
 from google.oauth2.credentials import Credentials
+from google import genai
 import os
 
 app = FastAPI(
     title="OSINT Evidence Copilot API",
     description="Connects local Copilots and Open WebUI to the OSINT BigQuery Database and GCS Vault.",
-    version="1.0.0"
+    version="2.0.0"
 )
 
 # Load OAuth Credentials (assuming token.json is in the same dir)
@@ -19,6 +20,15 @@ if not os.path.exists(TOKEN_PATH):
 creds = Credentials.from_authorized_user_file(TOKEN_PATH)
 bq_client = bigquery.Client(project="noble-beanbag-497411-m4")
 gcs_client = storage.Client(project="noble-beanbag-497411-m4")
+
+# Initialize Gemini AI Studio client
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+if not GEMINI_API_KEY:
+    print("WARNING: GEMINI_API_KEY not set. /api/analyze will be unavailable.")
+    ai_client = None
+else:
+    ai_client = genai.Client(api_key=GEMINI_API_KEY)
+    print("AI Studio client initialized (gemini-2.5-flash)")
 
 class SearchRequest(BaseModel):
     search_term: str
@@ -189,7 +199,153 @@ async def query_gis(request: GisQueryRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# ============================================================
+# AI LAYER — Gemini via AI Studio
+# ============================================================
+
+class AnalyzeRequest(BaseModel):
+    query: str
+    target_datasets: list[str] = []
+    include_audit_text: bool = False
+
+class CrossReferenceRequest(BaseModel):
+    entity_a: str
+    entity_b: str
+    dataset_a: str = ""
+    dataset_b: str = ""
+
+SYSTEM_PROMPT = """You are an OSINT forensic analyst assisting with a RICO investigation into the Huntington Beach / Orange County homeless services fraud network.
+
+Key investigation targets:
+- Andrew Do (former OC Supervisor)
+- Viet America Society (VAS)
+- RPM Team / RPM Modular
+- Mercy House Living Centers (CEO: Larry Haynes)
+- City of Huntington Beach
+- County of Orange
+- Casa Aliento LP (bought Mercy House CHDO's Vagabond Inn for $15M)
+
+You have access to structured evidence including:
+- rico_evidence_matrix.csv (2,696 HB out-of-state LLCs cross-referenced with IRS 990, NV SOS, PPP loans)
+- mercy_house_gsa_audit_2024.txt (44-page audited financials showing $74.2M revenue, $1.5M audit finding)
+- master_index_v2.db (OSINT matrix with nodes, relationships, authority sources)
+- BigQuery: national_audits.gmail_index (30,000 emails), ai_sandbox.findings
+
+Always cite specific dollar amounts, EINs, dates, and document sources. Flag any FCA (False Claims Act), grant fraud, kickback, or RICO predicate act indicators."""
+
+@app.post("/api/analyze")
+async def analyze(request: AnalyzeRequest):
+    """Send a natural language query to Gemini for RICO analysis."""
+    if ai_client is None:
+        raise HTTPException(status_code=503, detail="AI Studio client not initialized. Set GEMINI_API_KEY env var.")
+
+    context_parts = [SYSTEM_PROMPT]
+
+    # Optionally load audit text
+    if request.include_audit_text:
+        audit_path = r"C:\Users\HP\OneDrive\Documents\opencode_work\mercy_house_gsa_audit_2024.txt"
+        if os.path.exists(audit_path):
+            with open(audit_path, "r", encoding="utf-8") as f:
+                audit_text = f.read()[:120000]
+            context_parts.append(f"\n=== MERCY HOUSE GSA AUDIT 2024 (partial) ===\n{audit_text}\n=== END AUDIT ===")
+
+    # Search BigQuery datasets if requested
+    for dataset in request.target_datasets:
+        try:
+            parts = dataset.split(".")
+            if len(parts) == 2:
+                table_ref = f"noble-beanbag-497411-m4.{dataset}"
+                sample_query = f"SELECT * FROM `{table_ref}` LIMIT 50"
+                job = bq_client.query(sample_query)
+                rows = [dict(row) for row in job.result()]
+                if rows:
+                    import json
+                    context_parts.append(f"\n=== BigQuery: {dataset} (50 rows) ===\n{json.dumps(rows, default=str)[:80000]}\n=== END BQ ===")
+        except Exception as e:
+            context_parts.append(f"\nBigQuery {dataset}: unavailable ({e})")
+
+    context_parts.append(f"\nUSER QUERY: {request.query}")
+    full_prompt = "\n".join(context_parts)
+
+    try:
+        response = ai_client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=full_prompt,
+        )
+        return {
+            "status": "success",
+            "query": request.query,
+            "analysis": response.text,
+            "model": "gemini-2.5-flash"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI Studio error: {e}")
+
+@app.post("/api/cross_reference")
+async def cross_reference(request: CrossReferenceRequest):
+    """Cross-reference two entities using the RICO evidence matrix."""
+    if ai_client is None:
+        raise HTTPException(status_code=503, detail="AI Studio client not initialized.")
+
+    import csv
+    import json
+
+    # Load the RICO evidence matrix
+    rico_path = r"C:\Users\HP\OneDrive\Documents\opencode_work\rico_evidence_matrix.csv"
+    rico_context = ""
+    if os.path.exists(rico_path):
+        with open(rico_path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            # Filter rows matching either entity
+            matches = []
+            for row in reader:
+                row_text = json.dumps(row, default=str).lower()
+                if request.entity_a.lower() in row_text or request.entity_b.lower() in row_text:
+                    matches.append(row)
+                if len(matches) >= 50:
+                    break
+            if matches:
+                rico_context = json.dumps(matches, default=str)[:60000]
+
+    prompt = f"""{SYSTEM_PROMPT}
+
+Cross-reference two entities for RICO connections.
+
+ENTITY A: {request.entity_a}
+ENTITY B: {request.entity_b}
+
+RICO EVIDENCE MATRIX (filtered):
+{rico_context if rico_context else 'No direct matches found in rico_evidence_matrix.csv'}
+
+Analyze:
+1. Direct connections (shared addresses, officers, EINs, LLCs)
+2. Funding overlaps (same grant programs, same funders)
+3. Geographic proximity (same city, same APN area)
+4. Timeline correlations (key dates)
+5. RICO predicate indicators (wire fraud, mail fraud, money laundering, FCA violations)"""
+
+    response = ai_client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=prompt,
+    )
+    return {"status": "success", "cross_reference": response.text, "model": "gemini-2.5-flash"}
+
+class AskRequest(BaseModel):
+    question: str
+
+@app.post("/api/ask")
+async def ask(request: AskRequest):
+    """Simple chat with Gemini, loaded with OSINT context. For general investigation questions."""
+    if ai_client is None:
+        raise HTTPException(status_code=503, detail="AI Studio client not initialized.")
+
+    prompt = SYSTEM_PROMPT + "\n\nUSER: " + request.question
+    response = ai_client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=prompt,
+    )
+    return {"status": "success", "answer": response.text, "model": "gemini-2.5-flash"}
+
 if __name__ == "__main__":
     import uvicorn
-    # Starts a local server on port 8000
     uvicorn.run(app, host="127.0.0.1", port=8000)

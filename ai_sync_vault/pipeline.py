@@ -7,7 +7,7 @@ from google.cloud.bigquery import SchemaField
 import pandas as pd
 
 # --- CONFIG ---
-DIR = r"C:\Users\HP\OneDrive\Documents"
+DIR = r"G:\ppp_rico_data"
 PROJECT = "157249702170"
 DATASET = "ppp_rico"
 TABLE_SUB = "ppp_up_to_150k"
@@ -231,6 +231,7 @@ def step_export(client):
 
 # --- MAIN ---
 def main():
+    os.makedirs(DIR, exist_ok=True)
     os.chdir(DIR)
     print("=== PPP BigQuery Pipeline ===\n")
 
