@@ -59,7 +59,7 @@ def ingest_arcgis_layer(layer_url, table_name, max_features=2000):
     job_config = bigquery.LoadJobConfig(
         source_format=bigquery.SourceFormat.NEWLINE_DELIMITED_JSON,
         autodetect=True,
-        write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE
+        write_disposition=bigquery.WriteDisposition.WRITE_APPEND
     )
     
     with open(tmp_path, "rb") as source_file:

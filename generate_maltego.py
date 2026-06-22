@@ -2,7 +2,7 @@ import csv
 import os
 
 # Define the artifact directory
-artifact_dir = r"C:\Users\HP\.gemini\antigravity-ide\brain\c370d570-1fbc-427b-a511-94af4ff83ad7"
+artifact_dir = r"C:\Users\HP\.gemini\antigravity-ide\brain\3166e8b4-ddb0-4b7a-86f2-58e38034981c"
 output_file = os.path.join(artifact_dir, "RICO_HBNC_Maltego_Import.csv")
 
 # Data structure: Source Entity, Source Type, Link Label, Target Entity, Target Type

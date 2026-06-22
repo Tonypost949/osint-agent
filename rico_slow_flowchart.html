@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RICO Flowchart – Slow Build</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background: #0a0f1e;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+        .card {
+            background: #0e1621;
+            border-radius: 2rem;
+            padding: 1.5rem;
+            max-width: 1200px;
+            width: 100%;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.5);
+        }
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        button {
+            background: #2a3a4e;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            color: #ffaa66;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #3a4a5e;
+        }
+        .speed-label {
+            color: #e1e9f0;
+            font-size: 0.8rem;
+        }
+        input[type="range"] {
+            width: 200px;
+            cursor: pointer;
+            background: #2a3a4e;
+            height: 4px;
+            border-radius: 5px;
+        }
+        .status {
+            color: #8e9eae;
+            font-size: 0.75rem;
+            text-align: center;
+            margin-top: 1rem;
+            font-family: monospace;
+        }
+        .mermaid-container {
+            background: #0e1621;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+        .mermaid svg {
+            max-width: 100%;
+            height: auto;
+            background: #0e1621;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="controls">
+        <button id="playBtn">▶ Play slow build</button>
+        <button id="resetBtn">⟳ Reset</button>
+        <span class="speed-label">Speed: </span>
+        <input type="range" id="speedSlider" min="200" max="2000" value="800" step="50">
+        <span id="speedValue" class="speed-label">800ms</span>
+    </div>
+    <div class="mermaid-container">
+        <pre class="mermaid" id="mermaidDiagram">
+flowchart TD
+    ANDREW_DO["ANDREW DO<br/>Convicted - $6.1M Fraud"]
+    OCTA_VOTE["OCTA I-405 Vote<br/>$627M Loan"]
+    COVID_FRAUD["COVID Relief - VAS<br/>Kickbacks"]
+    LMIHAF["LMIHAF Funds → Yamada"]
+    SHEA["Shea Properties<br/>Eviction Machine"]
+    UNCLAIMED["Unclaimed Property<br/>$5.2M-$7.5M hidden<br/>Nguyen, Pham Trusts"]
+    LAND_SALE["Land Sale $3.16M"]
+    HBNC["HBNC Site<br/>Cr(VI) 49x limit"]
+    OCHCA["OCHCA False Closure<br/>Case #20IC002"]
+    YOUR_EVICTION["Your Eviction<br/>212 Southbrook"]
+    JUDGE_LUEGE["Judge Carmen Luege<br/>Disqualified but signed<br/>Presides over Airshow Audit"]
+    QI_CHEN["Qi Chen (SCE)<br/>HB Technical Review Committee<br/>Undergrounding Cover-up"]
+
+    MISSING_26B["💸 $26 BILLION MISSING / UNTRACKED<br/>━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br/>📊 State Auditor (4/2024): $24B untracked<br/>💉 EDD COVID fraud: $20-55B<br/>🏠 DOJ homelessness waste: $37B<br/>📈 ACA/Medicare fraud (CA): $27B+<br/>━━━━━━━━━━━━━━━━━━━━━━━━━━━━<br/>→ Total missing conservatively $26B+<br/>→ Real number likely >$100B"]
+
+    ANDREW_DO --> OCTA_VOTE
+    ANDREW_DO --> COVID_FRAUD
+    ANDREW_DO --> LMIHAF
+    ANDREW_DO --> SHEA
+    ANDREW_DO --> UNCLAIMED
+    
+    LMIHAF --> LAND_SALE
+    LAND_SALE --> HBNC
+    HBNC --> OCHCA
+    
+    SHEA --> YOUR_EVICTION
+    YOUR_EVICTION --> JUDGE_LUEGE
+    
+    JUDGE_LUEGE --> QI_CHEN
+    
+    UNCLAIMED --> JUDGE_LUEGE
+    QI_CHEN --> HBNC
+
+    COVID_FRAUD -.-> MISSING_26B
+    LMIHAF -.-> MISSING_26B
+    UNCLAIMED -.-> MISSING_26B
+    OCTA_VOTE -.-> MISSING_26B
+    MISSING_26B -.-> ANDREW_DO
+        </pre>
+    </div>
+    <div class="status" id="status">Ready. Press Play to build slowly.</div>
+</div>
+
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+
+    let currentStep = 0;
+    let animationTimer = null;
+    let allElements = [];      // stores { element, type, id, originalOpacity }
+    let svgRoot = null;
+
+    async function renderDiagram() {
+        // Remove any existing SVG
+        const container = document.querySelector('.mermaid');
+        if (container.nextSibling && container.nextSibling.tagName === 'svg') {
+            container.nextSibling.remove();
+        }
+        // Re-render
+        await mermaid.run({ nodes: [container], suppressErrors: true });
+        svgRoot = container.nextSibling;
+        if (!svgRoot) return;
+        // Collect all nodes and edges
+        const elements = [];
+        // Nodes: groups with class "node" or "cluster"
+        const nodes = svgRoot.querySelectorAll('.node, .cluster');
+        nodes.forEach(node => {
+            const id = node.id;
+            const rect = node.querySelector('rect, polygon');
+            if (rect) {
+                const opacity = rect.getAttribute('opacity') || '1';
+                elements.push({ element: rect, type: 'node', id, originalOpacity: opacity });
+            }
+            // Also text inside node
+            const text = node.querySelector('text');
+            if (text) {
+                elements.push({ element: text, type: 'node-text', id, originalOpacity: text.getAttribute('opacity') || '1' });
+            }
+        });
+        // Edges: paths with class "flowchart-link" or "edge"
+        const edges = svgRoot.querySelectorAll('.flowchart-link, .edge');
+        edges.forEach(edge => {
+            const path = edge.querySelector('path');
+            if (path) {
+                elements.push({ element: path, type: 'edge', id: edge.id, originalOpacity: path.getAttribute('opacity') || '1' });
+            }
+            const text = edge.querySelector('text');
+            if (text) {
+                elements.push({ element: text, type: 'edge-text', id: edge.id, originalOpacity: text.getAttribute('opacity') || '1' });
+            }
+        });
+        return elements;
+    }
+
+    async function resetAndCollect() {
+        if (animationTimer) clearTimeout(animationTimer);
+        await renderDiagram();
+        allElements = await renderDiagram(); // re-collect after fresh render
+        // Hide everything
+        allElements.forEach(el => {
+            el.element.setAttribute('opacity', '0');
+            el.element.style.opacity = '0';
+        });
+        currentStep = 0;
+        document.getElementById('status').innerText = `Reset. 0 / ${allElements.length} elements visible. Press Play.`;
+    }
+
+    function showNext() {
+        if (currentStep < allElements.length) {
+            const el = allElements[currentStep];
+            el.element.setAttribute('opacity', el.originalOpacity);
+            el.element.style.opacity = el.originalOpacity;
+            currentStep++;
+            const speed = parseInt(document.getElementById('speedSlider').value);
+            document.getElementById('status').innerText = `Building... ${currentStep} / ${allElements.length} elements visible`;
+            animationTimer = setTimeout(showNext, speed);
+        } else {
+            document.getElementById('status').innerText = `Complete. All ${allElements.length} elements visible.`;
+            animationTimer = null;
+        }
+    }
+
+    function startBuild() {
+        if (animationTimer) clearTimeout(animationTimer);
+        if (currentStep >= allElements.length) {
+            // Already complete, reset first?
+            resetAndCollect().then(() => {
+                currentStep = 0;
+                startBuild();
+            });
+            return;
+        }
+        showNext();
+    }
+
+    document.getElementById('playBtn').addEventListener('click', async () => {
+        if (animationTimer) {
+            clearTimeout(animationTimer);
+            animationTimer = null;
+            document.getElementById('status').innerText = 'Stopped. Press Play to continue.';
+            return;
+        }
+        if (currentStep === 0 && allElements.length === 0) {
+            await resetAndCollect();
+        }
+        startBuild();
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', async () => {
+        if (animationTimer) {
+            clearTimeout(animationTimer);
+            animationTimer = null;
+        }
+        await resetAndCollect();
+    });
+
+    const slider = document.getElementById('speedSlider');
+    const speedVal = document.getElementById('speedValue');
+    slider.addEventListener('input', (e) => {
+        speedVal.innerText = e.target.value + 'ms';
+    });
+
+    // Initial load
+    (async () => {
+        await resetAndCollect();
+    })();
+</script>
+</body>
+</html>

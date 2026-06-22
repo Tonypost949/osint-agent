@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOLD DIGGER AI — UNIFIED DASHBOARD</title>
+  <style>
+    :root {
+      --bg-color: #050505;
+      --grid-line: #333;
+      --neon-accent: #e63946;
+      --neon-secondary: #00f5d4;
+      --text-main: #f1f1f1;
+    }
+    
+    body {
+      margin: 0; padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Tablet-optimized 3x3 Grid */
+    .matrix-container {
+      display: grid;
+      grid-template-columns: repeat(3, 32vh);
+      grid-template-rows: repeat(3, 32vh);
+      gap: 3px;
+      background-color: var(--grid-line);
+      border: 3px solid var(--grid-line);
+    }
+
+    .grid-cell {
+      background-color: #111;
+      position: relative;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    /* Center Node holds the Map */
+    .center-node {
+      padding: 0; /* Remove padding so map fills it */
+      background-color: #000;
+      border: 2px solid var(--neon-accent);
+      box-shadow: 0 0 25px rgba(230, 57, 70, 0.6) inset;
+    }
+
+    .header {
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: var(--neon-secondary);
+      text-transform: uppercase;
+      border-bottom: 1px solid #333;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+    }
+
+    .data-content {
+      font-size: 0.75rem;
+      line-height: 1.5;
+      color: #ccc;
+    }
+
+    .data-content ul {
+      margin: 0; padding-left: 15px;
+    }
+    
+    .data-content strong { color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div class="matrix-container">
+    
+    <!-- Top Left: Environment / CEQA -->
+    <div class="grid-cell">
+      <div class="header">[0,0] HAZMAT / CEQA</div>
+      <div class="data-content">
+        <ul>
+          <li><strong>Location:</strong> 17642 Beach Blvd</li>
+          <li><strong>Toxins:</strong> Hexavalent Chromium, Arsenic</li>
+          <li><strong>Fraud:</strong> Class 1 Exemption Falsified</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Top Center: Maltego Upstream -->
+    <div class="grid-cell">
+      <div class="header">[0,1] UPSTREAM ACTORS</div>
+      <div class="data-content">
+        <ul>
+          <li><strong>Node:</strong> ANDREW DO (Supervisor)</li>
+          <li><strong>Node:</strong> VANGUARD</li>
+          <li><strong>Node:</strong> TAM NGUYEN</li>
+          <li><strong>Action:</strong> ARPA Grant Diversion</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Top Right: Financial / Funding -->
+    <div class="grid-cell">
+      <div class="header">[0,2] FINANCIAL PIPELINE</div>
+      <div class="data-content">
+        <ul>
+          <li><strong>City Contract:</strong> 23-12957/311705</li>
+          <li><strong>Source:</strong> Federal CDBG Funds</li>
+          <li><strong>Acquisition:</strong> $3,214,035</li>
+          <li><strong>Lease Auth:</strong> $120,000</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Center Left: Real Estate Shells -->
+    <div class="grid-cell">
+      <div class="header">[1,0] PROPERTY SHELLS</div>
+      <div class="data-content">
+        <ul>
+          <li>MERCY HOUSE CHDO LLC</li>
+          <li>CASA ALIENTO LP</li>
+          <li>COMMUNITY DEV PARTNERS</li>
+          <li><strong>Seller Carryback:</strong> $13.5M</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- EXACT CENTER: THE MAP IFRAME -->
+    <div class="grid-cell center-node">
+      <!-- We load the badass_osint_map.html directly inside the center square -->
+      <iframe src="badass_osint_map.html" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+
+    <!-- Center Right: Shodan / IoT -->
+    <div class="grid-cell">
+      <div class="header">[1,2] SHODAN IOT</div>
+      <div class="data-content">
+        <ul>
+          <li><strong>Target IP:</strong> 192.168.x.x (Ext)</li>
+          <li><strong>Port 80:</strong> Hikvision Cam</li>
+          <li><strong>Port 443:</strong> Open Web Panel</li>
+          <li><strong>Vuln:</strong> Default Creds (Admin/12345)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom Left: Property 2 / Vagabond -->
+    <div class="grid-cell">
+      <div class="header">[2,0] OXNARD SHELL</div>
+      <div class="data-content">
+        <ul>
+          <li><strong>Asset:</strong> Vagabond Inn (1245 N Oxnard)</li>
+          <li><strong>Conversion:</strong> Permanent Housing</li>
+          <li><strong>Entity:</strong> Casa Aliento LP</li>
+          <li><strong>Transfer:</strong> $15M "Sale" to self</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom Center: Maltego Downstream -->
+    <div class="grid-cell">
+      <div class="header">[2,1] DOWNSTREAM VENDORS</div>
+      <div class="data-content">
+        <ul>
+          <li><strong>Node:</strong> RPM TEAM</li>
+          <li><strong>Contract:</strong> $2.2M Modular Config</li>
+          <li><strong>Sub-contractors:</strong> Pending CPRA Data</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom Right: Command Options -->
+    <div class="grid-cell">
+      <div class="header">[2,2] COMMAND OPTIONS</div>
+      <div class="data-content">
+        <ul>
+          <li>[ X ] Execute PPP Pipeline.py</li>
+          <li>[ C ] Send CPRA Demands</li>
+          <li>[ S ] Sub-divide Center Node</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

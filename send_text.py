@@ -47,8 +47,8 @@ def send_text_message():
         # Keep SMS body short and simple
         message.set_content(
             "Zeus connected.\n"
-            "Dashboard: http://192.168.1.91:8080\n"
-            "Chat AI: http://192.168.1.91:8501"
+            "Dashboard: http://192.168.1.121:8080/osint_gemini_gis.html\n"
+            "Chat AI: http://192.168.1.121:8501"
         )
         message['To'] = recipient
         message['From'] = 'txtdjdrop@gmail.com'

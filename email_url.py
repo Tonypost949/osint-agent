@@ -16,7 +16,7 @@ def send_url_email():
     service = build('gmail', 'v1', credentials=creds)
 
     message = EmailMessage()
-    message.set_content("Click this link on your tablet to open the Makaveli OSINT Command Center Dashboard:\n\nhttp://192.168.1.121:8080")
+    message.set_content("Click this link on your tablet to open the Makaveli OSINT Command Center Dashboard:\n\nhttp://192.168.1.121:8080/osint_gemini_gis.html")
     message['To'] = 'txtdjdrop@gmail.com'
     message['From'] = 'txtdjdrop@gmail.com'
     message['Subject'] = 'OSINT Zeus: Dashboard Tablet Link'

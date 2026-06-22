@@ -208,7 +208,7 @@ def ingest_to_bq(rows):
 
     job_config = bigquery.LoadJobConfig(
         schema=BQ_SCHEMA,
-        write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,  # Full refresh each scan
+        write_disposition=bigquery.WriteDisposition.WRITE_APPEND,  # SAFE APPEND (never truncate)
         source_format=bigquery.SourceFormat.NEWLINE_DELIMITED_JSON,
     )
 
