@@ -3,7 +3,7 @@ WITH state_root AS (
     state,
     state_name
   FROM 
-    `project-743aab84-f9a5-4ec7-954.national_audits.all_state_records`
+    `noble-beanbag-497411-m4.national_audits.all_state_records`
   WHERE 
     state = 'CA'
 ),
@@ -15,7 +15,7 @@ audit_metrics AS (
     audit.report_num,
     audit.taxpayer_funds_reviewed
   FROM 
-    `project-743aab84-f9a5-4ec7-954.national_audits.all_state_records` r,
+    `noble-beanbag-497411-m4.national_audits.all_state_records` r,
     UNNEST(r.performance_audit_list) AS audit
   WHERE 
     audit.report_num = '2023-102.1'
@@ -27,12 +27,12 @@ non_profit_leakage AS (
     npi.organization_name,
     npi.cms_billing_code,
     npi.unaccounted_fund_delta AS original_delta,
-    `project-743aab84-f9a5-4ec7-954.national_audits.calculate_fund_leakage`(
+    `noble-beanbag-497411-m4.national_audits.calculate_fund_leakage`(
       24000000000, 
       13700000000  
     ) AS calculated_leakage_delta
   FROM 
-    `project-743aab84-f9a5-4ec7-954.national_audits.all_state_records` r,
+    `noble-beanbag-497411-m4.national_audits.all_state_records` r,
     UNNEST(r.non_profiteers_index) AS npi
   WHERE 
     UPPER(npi.organization_name) LIKE '%MERCY HOUSE%'
@@ -47,7 +47,7 @@ environmental_hazard AS (
     env.test_multiplier,
     env.closure_status
   FROM 
-    `project-743aab84-f9a5-4ec7-954.national_audits.all_state_records` r,
+    `noble-beanbag-497411-m4.national_audits.all_state_records` r,
     UNNEST(r.environmental_site_assessments) AS env
   WHERE 
     UPPER(env.location_name) LIKE '%HUNTINGTON BEACH%'
