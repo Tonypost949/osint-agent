@@ -291,10 +291,11 @@ TEMPLATE = """
         <!-- Alerts Tab -->
         <div id="alerts" class="tab-content">
             <div class="card">
-                <h2>Broadcast Action Alerts</h2>
+                <h2>Broadcast Action Alerts & Active Tracing</h2>
                 <div style="display: flex; gap: 20px;">
                     <button style="background-color: #ef4444;" onclick="triggerAlert('text')">📱 SEND SMS ALERT TO HANDSET</button>
                     <button style="background-color: #3b82f6;" onclick="triggerAlert('email')">✉️ EMAIL FULL DOSSIER</button>
+                    <button style="background-color: #8b5cf6;" onclick="triggerTrace()">🌐 TRACE FOREIGN REMITTANCES</button>
                 </div>
                 <div id="alert-status" style="margin-top: 20px; font-family: monospace;"></div>
             </div>
@@ -316,6 +317,22 @@ TEMPLATE = """
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type: alertType })
             })
+            .then(r => r.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    document.getElementById('alert-status').innerHTML = '<span style="color:#39ff14;">[SUCCESS] ' + data.output.replace(/\\n/g, '<br>') + '</span>';
+                } else {
+                    document.getElementById('alert-status').innerHTML = '<span style="color:#ff2a5f;">[ERROR] ' + data.error + '</span>';
+                }
+            })
+            .catch(err => {
+                document.getElementById('alert-status').innerHTML = '<span style="color:#ff2a5f;">[ERROR] ' + err + '</span>';
+            });
+        }
+
+        function triggerTrace() {
+            document.getElementById('alert-status').innerHTML = '<span style="color:yellow;">Initiating Deep Graph Trace: Tracking High-Velocity Offshore Nodes...</span>';
+            fetch('/api/trace_remittances')
             .then(r => r.json())
             .then(data => {
                 if(data.status === 'success') {
@@ -434,6 +451,15 @@ def api_alert():
             return jsonify({"status": "success", "output": "Email Dossier Sent successfully.\n" + result.stdout})
         else:
             return jsonify({"status": "error", "error": "Invalid alert type"}), 400
+    except Exception as e:
+        return jsonify({"status": "error", "error": str(e)}), 500
+
+@app.route("/api/trace_remittances")
+def api_trace_remittances():
+    import subprocess
+    try:
+        result = subprocess.run([sys.executable, r"c:\Users\HP\.gemini\antigravity-ide\scratch\osint-agent\trace_remittance_network.py"], capture_output=True, text=True)
+        return jsonify({"status": "success", "output": result.stdout})
     except Exception as e:
         return jsonify({"status": "error", "error": str(e)}), 500
 

@@ -58,7 +58,7 @@ def cross_reference_with_bigquery(entities):
             
         sql_query = f"""
         SELECT 
-            state_code,
+            state,
             npi.organization_name,
             npi.cms_billing_code,
             npi.unaccounted_fund_delta
@@ -75,7 +75,7 @@ def cross_reference_with_bigquery(entities):
             
             for row in results:
                 matches_found += 1
-                print(f" [!] MATCH FOUND [{row.state_code}]")
+                print(f" [!] MATCH FOUND [{row.state}]")
                 print(f"     └─ Entity: {row.organization_name}")
                 print(f"     └─ Billing Code: {row.cms_billing_code}")
                 print(f"     └─ Unaccounted Delta: ${float(row.unaccounted_fund_delta):,.2f}\n")
