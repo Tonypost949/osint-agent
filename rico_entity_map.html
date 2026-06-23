@@ -1,7 +1,17 @@
-# OSINT Entity Network Map — Huntington Beach RICO Investigation
-## v2 — Three Pipelines
-
-```mermaid
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RICO Entity Map - v2</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: sans-serif; }
+    </style>
+</head>
+<body>
+    <h1>RICO Entity Map - v2 — Three Pipelines</h1>
+    <div class="mermaid">
 graph TD
     subgraph "PIPELINE 1: PPP → PROPERTY"
         direction LR
@@ -80,23 +90,9 @@ graph TD
     
     classDef default fill:#eee,color:#000,stroke:#ccc;
 
-```
-
-## Entity Index
-
-| ID | Type | Name | Role |
-|----|------|------|------|
-| PER-001 | Person | Anthony Michael DiMarcello III | Primary Investigator |
-| PER-010 | Person | Peter Anh Pham | VAS founder; federal fugitive; 15 counts |
-| PER-?? | Person | Tam Nguyen | Garden Grove Community Foundation President |
-| PER-?? | Person | Larry Haynes | CEO, Mercy House |
-| ORG_OC_SSA | CPS | OC Social Services Agency | Removal authority, IV-E billing |
-| ORG_MERCY | Nonprofit | Mercy House Living Centers | Shelter operator, nexus of fraud |
-| SHL-DAH | Shell | Dylan & Andrew Holdings LLC | 7561 Center Ave / PPP layer |
-| PROP_HBNC | Toxic Site | 17631 Cameron Ln / 17642 Beach Blvd | Hex Cr-VI 49x EPA limit, child deaths |
-| FUND_IV_E | Federal | Title IV-E Program | Per-diem funding for foster placement |
-| EVID_CHILD_DEATHS | Evidence | 4 deaths + 279 emergencies | Documented at Mercy House facilities |
-| CASE_ICWA | Fraud | ICWA-IIM Fraud Pattern | Alleged improper Native child removal |
-
----
-*The above map is a working document and represents hypotheses under investigation based on available data. It is not a definitive statement of fact.*
+    </div>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</body>
+</html>

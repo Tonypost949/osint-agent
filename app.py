@@ -179,6 +179,8 @@ TEMPLATE = """
             <button class="tab-btn" onclick="switchTab('bigquery')">☁️ BigQuery Data</button>
             <button class="tab-btn" onclick="switchTab('briefings')">📄 Evidentiary Briefs</button>
             <button class="tab-btn" onclick="switchTab('flowchart')">📊 Flowchart Build</button>
+            <button class="tab-btn" onclick="switchTab('maps')">🗺️ Live Maps</button>
+            <button class="tab-btn" onclick="switchTab('alerts')">🚨 Alerts & Comms</button>
         </div>
 
         <!-- Dashboard Tab -->
@@ -270,6 +272,33 @@ TEMPLATE = """
                 <iframe src="/flowchart-iframe" style="width:100%; height:90%; border:none; border-radius:10px;"></iframe>
             </div>
         </div>
+
+        <!-- Maps Tab -->
+        <div id="maps" class="tab-content">
+            <div class="card" style="height: 800px;">
+                <h2>Geospatial Intelligence Map</h2>
+                <div class="form-group">
+                    <select id="map-select" onchange="document.getElementById('map-iframe').src = '/map/' + this.value">
+                        <option value="nationwide_coc_map.html">Nationwide CoC Leakage Map</option>
+                        <option value="osint_gemini_gis.html">OSINT Deep GIS Map</option>
+                        <option value="badass_osint_map.html">Global Flow / Badass Map</option>
+                    </select>
+                </div>
+                <iframe id="map-iframe" src="/map/nationwide_coc_map.html" style="width:100%; height:85%; border:none; border-radius:10px;"></iframe>
+            </div>
+        </div>
+
+        <!-- Alerts Tab -->
+        <div id="alerts" class="tab-content">
+            <div class="card">
+                <h2>Broadcast Action Alerts</h2>
+                <div style="display: flex; gap: 20px;">
+                    <button style="background-color: #ef4444;" onclick="triggerAlert('text')">📱 SEND SMS ALERT TO HANDSET</button>
+                    <button style="background-color: #3b82f6;" onclick="triggerAlert('email')">✉️ EMAIL FULL DOSSIER</button>
+                </div>
+                <div id="alert-status" style="margin-top: 20px; font-family: monospace;"></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -278,6 +307,26 @@ TEMPLATE = """
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.target.classList.add('active');
+        }
+
+        function triggerAlert(alertType) {
+            document.getElementById('alert-status').innerHTML = '<span style="color:yellow;">Initiating ' + alertType + ' broadcast...</span>';
+            fetch('/api/alert', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: alertType })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    document.getElementById('alert-status').innerHTML = '<span style="color:#39ff14;">[SUCCESS] ' + data.output.replace(/\\n/g, '<br>') + '</span>';
+                } else {
+                    document.getElementById('alert-status').innerHTML = '<span style="color:#ff2a5f;">[ERROR] ' + data.error + '</span>';
+                }
+            })
+            .catch(err => {
+                document.getElementById('alert-status').innerHTML = '<span style="color:#ff2a5f;">[ERROR] ' + err + '</span>';
+            });
         }
 
         function querySqlite() {
@@ -358,6 +407,35 @@ def flowchart_iframe():
         with open(flowchart_path, 'r', encoding='utf-8') as f:
             return f.read()
     return "Flowchart HTML file not found."
+
+@app.route("/map/<filename>")
+def serve_map(filename):
+    # Only allow html maps in this directory
+    if not filename.endswith('.html') or '/' in filename or '\\' in filename:
+        return "Invalid file request.", 400
+        
+    map_path = os.path.join(r"c:\Users\HP\.gemini\antigravity-ide\scratch\osint-agent", filename)
+    if os.path.exists(map_path):
+        with open(map_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    return "Map file not found.", 404
+
+@app.route("/api/alert", methods=["POST"])
+def api_alert():
+    import subprocess
+    req = request.get_json() or {}
+    alert_type = req.get('type')
+    try:
+        if alert_type == 'text':
+            result = subprocess.run([sys.executable, r"c:\Users\HP\.gemini\antigravity-ide\scratch\osint-agent\send_text.py"], capture_output=True, text=True)
+            return jsonify({"status": "success", "output": "SMS Dispatched successfully.\n" + result.stdout})
+        elif alert_type == 'email':
+            result = subprocess.run([sys.executable, r"c:\Users\HP\.gemini\antigravity-ide\scratch\osint-agent\send_email.py"], capture_output=True, text=True)
+            return jsonify({"status": "success", "output": "Email Dossier Sent successfully.\n" + result.stdout})
+        else:
+            return jsonify({"status": "error", "error": "Invalid alert type"}), 400
+    except Exception as e:
+        return jsonify({"status": "error", "error": str(e)}), 500
 
 @app.route("/api/sqlite")
 def api_sqlite():
