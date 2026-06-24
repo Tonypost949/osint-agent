@@ -1,9 +1,9 @@
-from google.cloud import bigquery
+﻿from google.cloud import bigquery
 
 projects = [
     "golden-agency-497410-t8",
     "hardy-order-496117-p3",
-    "noble-beanbag-497411-m4",
+    "project-743aab84-f9a5-4ec7-954",
     "project-743aab84-f9a5-4ec7-954",
     "superb-router-q8gvj"
 ]

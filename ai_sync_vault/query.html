@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -165,7 +165,7 @@
     <span class="function">SUM</span>(pit.sheltered_homeless) <span class="keyword">AS</span> total_sheltered,
     <span class="function">SUM</span>(pit.unsheltered_homeless) <span class="keyword">AS</span> total_unsheltered,
     <span class="function">MAX</span>(pit.count_year) <span class="keyword">AS</span> latest_pit_year
-  <span class="keyword">FROM</span> <span class="table">`noble-beanbag-497411-m4.national_audits.all_state_records`</span>,
+  <span class="keyword">FROM</span> <span class="table">`project-743aab84-f9a5-4ec7-954.national_audits.all_state_records`</span>,
   <span class="function">UNNEST</span>(hud_pit_list) <span class="keyword">AS</span> pit
   <span class="keyword">GROUP BY</span> state
 ),
@@ -176,7 +176,7 @@ NPI_Metrics <span class="keyword">AS</span> (
     state,
     <span class="function">COUNT</span>(npi.npi_id) <span class="keyword">AS</span> total_active_shell_entities,
     <span class="function">SUM</span>(npi.unaccounted_fund_delta) <span class="keyword">AS</span> aggregate_unaccounted_leakage
-  <span class="keyword">FROM</span> <span class="table">`noble-beanbag-497411-m4.national_audits.all_state_records`</span>,
+  <span class="keyword">FROM</span> <span class="table">`project-743aab84-f9a5-4ec7-954.national_audits.all_state_records`</span>,
   <span class="function">UNNEST</span>(non_profiteers_index) <span class="keyword">AS</span> npi
   <span class="keyword">GROUP BY</span> state
 ),
@@ -188,7 +188,7 @@ ESA_Metrics <span class="keyword">AS</span> (
     <span class="function">COUNT</span>(esa.site_id) <span class="keyword">AS</span> total_monitored_toxic_sites,
     <span class="function">COUNTIF</span>(esa.test_multiplier >= 10.0) <span class="keyword">AS</span> severe_chemical_safety_breaches,
     <span class="function">MAX</span>(<span class="keyword">CASE WHEN</span> esa.site_id = <span class="string">'ENV-HBNC-001'</span> <span class="keyword">THEN</span> esa.test_multiplier <span class="keyword">ELSE</span> <span class="keyword">NULL END</span>) <span class="keyword">AS</span> target_hbnc_crvi_multiplier
-  <span class="keyword">FROM</span> <span class="table">`noble-beanbag-497411-m4.national_audits.all_state_records`</span>,
+  <span class="keyword">FROM</span> <span class="table">`project-743aab84-f9a5-4ec7-954.national_audits.all_state_records`</span>,
   <span class="function">UNNEST</span>(environmental_site_assessments) <span class="keyword">AS</span> esa
   <span class="keyword">GROUP BY</span> state
 )
@@ -204,7 +204,7 @@ ESA_Metrics <span class="keyword">AS</span> (
   esa.total_monitored_toxic_sites,
   esa.severe_chemical_safety_breaches,
   esa.target_hbnc_crvi_multiplier <span class="keyword">AS</span> hbnc_toxic_excess_rate
-<span class="keyword">FROM</span> <span class="table">`noble-beanbag-497411-m4.national_audits.all_state_records`</span> <span class="keyword">AS</span> base
+<span class="keyword">FROM</span> <span class="table">`project-743aab84-f9a5-4ec7-954.national_audits.all_state_records`</span> <span class="keyword">AS</span> base
 <span class="keyword">LEFT JOIN</span> PIT_Metrics <span class="keyword">AS</span> pit <span class="keyword">ON</span> base.state = pit.state
 <span class="keyword">LEFT JOIN</span> NPI_Metrics <span class="keyword">AS</span> npi <span class="keyword">ON</span> base.state = npi.state
 <span class="keyword">LEFT JOIN</span> ESA_Metrics <span class="keyword">AS</span> esa <span class="keyword">ON</span> base.state = esa.state
@@ -219,7 +219,7 @@ ESA_Metrics <span class="keyword">AS</span> (
 
         <div class="footer">
             <strong>💡 Tip:</strong> Paste the query into your BigQuery console or run via <code>bq query</code>.<br>
-            Make sure the dataset <code>noble-beanbag-497411-m4.national_audits.all_state_records</code> exists and has the required arrays populated.
+            Make sure the dataset <code>project-743aab84-f9a5-4ec7-954.national_audits.all_state_records</code> exists and has the required arrays populated.
         </div>
     </div>
 
@@ -237,7 +237,7 @@ WITH PIT_Metrics AS (
     SUM(pit.sheltered_homeless) AS total_sheltered,
     SUM(pit.unsheltered_homeless) AS total_unsheltered,
     MAX(pit.count_year) AS latest_pit_year
-  FROM \`noble-beanbag-497411-m4.national_audits.all_state_records\`,
+  FROM \`project-743aab84-f9a5-4ec7-954.national_audits.all_state_records\`,
   UNNEST(hud_pit_list) AS pit
   GROUP BY state
 ),
@@ -248,7 +248,7 @@ NPI_Metrics AS (
     state,
     COUNT(npi.npi_id) AS total_active_shell_entities,
     SUM(npi.unaccounted_fund_delta) AS aggregate_unaccounted_leakage
-  FROM \`noble-beanbag-497411-m4.national_audits.all_state_records\`,
+  FROM \`project-743aab84-f9a5-4ec7-954.national_audits.all_state_records\`,
   UNNEST(non_profiteers_index) AS npi
   GROUP BY state
 ),
@@ -260,7 +260,7 @@ ESA_Metrics AS (
     COUNT(esa.site_id) AS total_monitored_toxic_sites,
     COUNTIF(esa.test_multiplier >= 10.0) AS severe_chemical_safety_breaches,
     MAX(CASE WHEN esa.site_id = 'ENV-HBNC-001' THEN esa.test_multiplier ELSE NULL END) AS target_hbnc_crvi_multiplier
-  FROM \`noble-beanbag-497411-m4.national_audits.all_state_records\`,
+  FROM \`project-743aab84-f9a5-4ec7-954.national_audits.all_state_records\`,
   UNNEST(environmental_site_assessments) AS esa
   GROUP BY state
 )
@@ -276,7 +276,7 @@ SELECT
   esa.total_monitored_toxic_sites,
   esa.severe_chemical_safety_breaches,
   esa.target_hbnc_crvi_multiplier AS hbnc_toxic_excess_rate
-FROM \`noble-beanbag-497411-m4.national_audits.all_state_records\` AS base
+FROM \`project-743aab84-f9a5-4ec7-954.national_audits.all_state_records\` AS base
 LEFT JOIN PIT_Metrics AS pit ON base.state = pit.state
 LEFT JOIN NPI_Metrics AS npi ON base.state = npi.state
 LEFT JOIN ESA_Metrics AS esa ON base.state = esa.state

@@ -1,11 +1,11 @@
-from google.cloud import bigquery
+﻿from google.cloud import bigquery
 
-GCP_PROJECT = "noble-beanbag-497411-m4"
+GCP_PROJECT = "project-743aab84-f9a5-4ec7-954"
 client = bigquery.Client(project=GCP_PROJECT)
 
 query = """
 SELECT clean_owner, ppp_borrower, SiteAddress, ppp_amount, ppp_date, lender, rico_risk_tier
-FROM `noble-beanbag-497411-m4.ppp_rico.v_rico_enterprise_master`
+FROM `project-743aab84-f9a5-4ec7-954.ppp_rico.v_rico_enterprise_master`
 WHERE UPPER(clean_owner) LIKE '%360 CLINIC%' 
    OR UPPER(clean_owner) LIKE '%2T MEDIA%' 
    OR UPPER(clean_owner) LIKE '%TAM NGUYEN%'

@@ -1,4 +1,4 @@
-# ============================================================================
+﻿# ============================================================================
 # index_new_uploads.py — Index sharedall Drive uploads into BigQuery
 # Purpose: Instantly catalog new files without full Drive scan
 # ============================================================================
@@ -14,7 +14,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 TOKEN_FILE = r"C:\Users\HP\OneDrive\Documents\opencode_work\OSINT_VAULT_BACKUP\token_drive_upload.json"
 SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 TARGET_FOLDER = "sharedall"
-PROJECT = "noble-beanbag-497411-m4"
+PROJECT = "project-743aab84-f9a5-4ec7-954"
 DATASET = "national_audits"
 TABLE = "drive_file_index"
 

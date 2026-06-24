@@ -1,8 +1,8 @@
-import os
+﻿import os
 from google.cloud import bigquery
 
 def load_data():
-    project_id = "noble-beanbag-497411-m4"
+    project_id = "project-743aab84-f9a5-4ec7-954"
     client = bigquery.Client(project=project_id)
     
     # 1. Create dataset if it doesn't exist

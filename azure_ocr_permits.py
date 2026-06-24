@@ -1,4 +1,4 @@
-"""
+﻿"""
 azure_ocr_permits.py — OCR 687 permit PDFs via Azure Document Intelligence + pipe to BigQuery.
 Requires: azure_config.json or AZURE_DOC_INTEL_ENDPOINT / AZURE_DOC_INTEL_KEY env vars.
 Run: python azure_ocr_permits.py
@@ -18,7 +18,7 @@ for p in [config_path, alt]:
 
 endpoint = config.get("doc_intel_endpoint") or os.environ.get("AZURE_DOC_INTEL_ENDPOINT")
 key = config.get("doc_intel_key") or os.environ.get("AZURE_DOC_INTEL_KEY")
-PROJECT = "noble-beanbag-497411-m4"
+PROJECT = "project-743aab84-f9a5-4ec7-954"
 MANIFEST = r"C:\Users\HP\OneDrive\Documents\opencode_work\permit_backups_manifest.txt"
 
 if not endpoint or not key:

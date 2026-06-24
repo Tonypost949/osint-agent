@@ -1,8 +1,8 @@
--- Advanced Cross-Dataset Join: High-Risk Proximity View
+﻿-- Advanced Cross-Dataset Join: High-Risk Proximity View
 -- This query formally joins the hb_llcs structural shell data with the environmental hazard index and PPP/funding data
 -- to dynamically flag high-risk convergence zones (e.g., 7561 Center Ave, 17472 Beach Blvd).
 
-CREATE OR REPLACE VIEW `noble-beanbag-497411-m4.forensic_layers.vw_high_risk_proximity` AS
+CREATE OR REPLACE VIEW `project-743aab84-f9a5-4ec7-954.forensic_layers.vw_high_risk_proximity` AS
 
 WITH Target_Geographies AS (
     -- Define the primary hubs of convergence
@@ -22,7 +22,7 @@ LLC_Shells AS (
         apn,
         last_sale_amount,
         last_sale_notes
-    FROM `noble-beanbag-497411-m4.forensic_layers.ppp_loans`
+    FROM `project-743aab84-f9a5-4ec7-954.forensic_layers.ppp_loans`
     WHERE hb_property LIKE '%CENTER AVE%' 
        OR hb_property LIKE '%BEACH BLVD%'
        OR mail_address LIKE '%GARNET ST%'
@@ -34,7 +34,7 @@ PPP_Funding AS (
         entity_name,
         SUM(ppp_loan_1_amount + COALESCE(ppp_loan_2_amount, 0)) as total_federal_funding,
         MAX(naics_description) as primary_industry
-    FROM `noble-beanbag-497411-m4.forensic_layers.ppp_loans`
+    FROM `project-743aab84-f9a5-4ec7-954.forensic_layers.ppp_loans`
     GROUP BY entity_name
 )
 

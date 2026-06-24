@@ -1,11 +1,11 @@
-from google.cloud import bigquery
+﻿from google.cloud import bigquery
 
-GCP_PROJECT = "noble-beanbag-497411-m4"
+GCP_PROJECT = "project-743aab84-f9a5-4ec7-954"
 client = bigquery.Client(project=GCP_PROJECT)
 
 query = """
 SELECT entity_identity, property_wrapper, property_address, transfer_date, transfer_amount, loan_amount, ppp_loan_date, days_delta
-FROM `noble-beanbag-497411-m4.forensic_layers.ppp_property_timing`
+FROM `project-743aab84-f9a5-4ec7-954.forensic_layers.ppp_property_timing`
 ORDER BY ABS(days_delta) ASC
 LIMIT 50
 """

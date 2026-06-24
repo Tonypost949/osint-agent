@@ -1,4 +1,4 @@
-"""
+﻿"""
 dashboard_data.py — Generate live BigQuery stats JSON for the OSINT dashboard.
 Run: python dashboard_data.py
 Output: dashboard_stats.json (in osint-agent and opencode_work)
@@ -7,7 +7,7 @@ import json, os, sys
 from google.cloud import bigquery
 from datetime import datetime
 
-PROJECT = "noble-beanbag-497411-m4"
+PROJECT = "project-743aab84-f9a5-4ec7-954"
 client = bigquery.Client(project=PROJECT)
 
 stats = {"generated_at": datetime.now().isoformat(), "tables": {}}

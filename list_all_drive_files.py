@@ -1,13 +1,13 @@
-import os
+﻿import os
 import json
 from google.cloud import bigquery
 
-bq_client = bigquery.Client(project="noble-beanbag-497411-m4")
+bq_client = bigquery.Client(project="project-743aab84-f9a5-4ec7-954")
 
 print("Querying drive_file_index...")
 query = """
 SELECT file_id, file_name, mime_type, modified_time, owner_emails, web_view_link
-FROM `noble-beanbag-497411-m4.national_audits.drive_file_index`
+FROM `project-743aab84-f9a5-4ec7-954.national_audits.drive_file_index`
 ORDER BY file_name
 """
 

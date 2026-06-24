@@ -1,7 +1,7 @@
-import os
+﻿import os
 from google.cloud import bigquery
 
-GCP_PROJECT = "noble-beanbag-497411-m4"
+GCP_PROJECT = "project-743aab84-f9a5-4ec7-954"
 BQ_DATASET = "national_audits"
 
 def check_counts():

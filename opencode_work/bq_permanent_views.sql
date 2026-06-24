@@ -1,10 +1,10 @@
--- ====== v_7561_center_ave_cluster ======
+﻿-- ====== v_7561_center_ave_cluster ======
 
-    CREATE OR REPLACE VIEW `noble-beanbag-497411-m4.ppp_rico.v_7561_center_ave_cluster` AS
+    CREATE OR REPLACE VIEW `project-743aab84-f9a5-4ec7-954.ppp_rico.v_7561_center_ave_cluster` AS
     -- All entities linked to 7561 Center Ave, Huntington Beach commercial park
     WITH llcs_at_7561 AS (
         SELECT *
-        FROM `noble-beanbag-497411-m4.ppp_rico.hb_llcs`
+        FROM `project-743aab84-f9a5-4ec7-954.ppp_rico.hb_llcs`
         WHERE UPPER(SiteAddress) LIKE '%7561%CENTER%'
            OR UPPER(MailAddress) LIKE '%7561%CENTER%'
     ),
@@ -15,7 +15,7 @@
             BusinessType, NAICSCode, NonProfit, JobsReported,
             ServicingLenderName, OriginatingLender,
             UPPER(REGEXP_REPLACE(BorrowerName, r'[-.,&/() ]', '')) AS clean_name
-        FROM `noble-beanbag-497411-m4.ppp_rico.ppp_150k_plus`
+        FROM `project-743aab84-f9a5-4ec7-954.ppp_rico.ppp_150k_plus`
         UNION ALL
         SELECT 
             BorrowerName, BorrowerCity, BorrowerState,
@@ -23,7 +23,7 @@
             BusinessType, NAICSCode, NonProfit, JobsReported,
             ServicingLenderName, OriginatingLender,
             UPPER(REGEXP_REPLACE(BorrowerName, r'[-.,&/() ]', '')) AS clean_name
-        FROM `noble-beanbag-497411-m4.ppp_rico.ppp_up_to_150k`
+        FROM `project-743aab84-f9a5-4ec7-954.ppp_rico.ppp_up_to_150k`
     )
     SELECT 
         l.Owner1 AS llc_owner,
@@ -52,12 +52,12 @@
 
 -- ====== v_beach_blvd_contamination_zone ======
 
-    CREATE OR REPLACE VIEW `noble-beanbag-497411-m4.ppp_rico.v_beach_blvd_contamination_zone` AS
+    CREATE OR REPLACE VIEW `project-743aab84-f9a5-4ec7-954.ppp_rico.v_beach_blvd_contamination_zone` AS
     -- LLCs and PPP entities within 0.5 mile of 17642 Beach Blvd (HBNC footprint)
     -- Addresses: 17642 Beach Blvd, 17631 Cameron Ln, 17472 Beach Blvd (G&M Oil #124)
     WITH zone_llcs AS (
         SELECT *
-        FROM `noble-beanbag-497411-m4.ppp_rico.hb_llcs`
+        FROM `project-743aab84-f9a5-4ec7-954.ppp_rico.hb_llcs`
         WHERE UPPER(SiteAddress) LIKE '%17642%BEACH%'
            OR UPPER(SiteAddress) LIKE '%17472%BEACH%'
            OR UPPER(SiteAddress) LIKE '%17631%CAMERON%'
@@ -75,7 +75,7 @@
             BusinessType, NAICSCode, NonProfit, JobsReported,
             ServicingLenderName,
             UPPER(REGEXP_REPLACE(BorrowerName, r'[-.,&/() ]', '')) AS clean_name
-        FROM `noble-beanbag-497411-m4.ppp_rico.ppp_150k_plus`
+        FROM `project-743aab84-f9a5-4ec7-954.ppp_rico.ppp_150k_plus`
         UNION ALL
         SELECT 
             BorrowerName, BorrowerCity, BorrowerState,
@@ -83,7 +83,7 @@
             BusinessType, NAICSCode, NonProfit, JobsReported,
             ServicingLenderName,
             UPPER(REGEXP_REPLACE(BorrowerName, r'[-.,&/() ]', '')) AS clean_name
-        FROM `noble-beanbag-497411-m4.ppp_rico.ppp_up_to_150k`
+        FROM `project-743aab84-f9a5-4ec7-954.ppp_rico.ppp_up_to_150k`
     )
     SELECT 
         l.Owner1 AS llc_owner,
@@ -109,7 +109,7 @@
 
 -- ====== v_mailbox_cluster_hubs ======
 
-    CREATE OR REPLACE VIEW `noble-beanbag-497411-m4.ppp_rico.v_mailbox_cluster_hubs` AS
+    CREATE OR REPLACE VIEW `project-743aab84-f9a5-4ec7-954.ppp_rico.v_mailbox_cluster_hubs` AS
     -- CMRA hubs with 3+ LLCs, aggregated with PPP enrichment
     WITH mailbox_stats AS (
         SELECT 
@@ -120,7 +120,7 @@
             MAX(LastSaleDate) AS last_sale,
             STRING_AGG(DISTINCT Owner1, ' | ' ORDER BY Owner1) AS llc_names,
             STRING_AGG(DISTINCT APN, '; ') AS apns
-        FROM `noble-beanbag-497411-m4.ppp_rico.hb_llcs`
+        FROM `project-743aab84-f9a5-4ec7-954.ppp_rico.hb_llcs`
         WHERE MailAddress IS NOT NULL 
           AND MailAddress != ''
         GROUP BY MailAddress
@@ -156,7 +156,7 @@
 
 -- ====== v_nonprofit_board_ppp_self_dealing ======
 
-    CREATE OR REPLACE VIEW `noble-beanbag-497411-m4.ppp_rico.v_nonprofit_board_ppp_self_dealing` AS
+    CREATE OR REPLACE VIEW `project-743aab84-f9a5-4ec7-954.ppp_rico.v_nonprofit_board_ppp_self_dealing` AS
     -- Board members whose vendor companies received PPP
     SELECT 
         'MLADEN BUNTICH' AS board_member,
@@ -191,7 +191,7 @@
 
 -- ====== v_rico_enterprise_master ======
 
-    CREATE OR REPLACE VIEW `noble-beanbag-497411-m4.ppp_rico.v_rico_enterprise_master` AS
+    CREATE OR REPLACE VIEW `project-743aab84-f9a5-4ec7-954.ppp_rico.v_rico_enterprise_master` AS
     -- Master join: HB LLCs + PPP + Environmental + Nonprofit connections
     WITH 
     llc_enriched AS (
@@ -199,7 +199,7 @@
             Owner1, Owner2, SiteAddress, MailAddress, MailCity,
             APN, LastSeller, LastSaleDate, LastSaleValue,
             UPPER(REGEXP_REPLACE(Owner1, r'[-.,&/() ]', '')) AS clean_owner
-        FROM `noble-beanbag-497411-m4.ppp_rico.hb_llcs`
+        FROM `project-743aab84-f9a5-4ec7-954.ppp_rico.hb_llcs`
     ),
     ppp_enriched AS (
         SELECT 
@@ -208,7 +208,7 @@
             BusinessType, NAICSCode, NonProfit, Gender, Veteran,
             JobsReported, ServicingLenderName, OriginatingLender,
             UPPER(REGEXP_REPLACE(BorrowerName, r'[-.,&/() ]', '')) AS clean_name
-        FROM `noble-beanbag-497411-m4.ppp_rico.ppp_150k_plus`
+        FROM `project-743aab84-f9a5-4ec7-954.ppp_rico.ppp_150k_plus`
         UNION ALL
         SELECT 
             BorrowerName, BorrowerCity, BorrowerState,
@@ -216,7 +216,7 @@
             BusinessType, NAICSCode, NonProfit, Gender, Veteran,
             JobsReported, ServicingLenderName, OriginatingLender,
             UPPER(REGEXP_REPLACE(BorrowerName, r'[-.,&/() ]', '')) AS clean_name
-        FROM `noble-beanbag-497411-m4.ppp_rico.ppp_up_to_150k`
+        FROM `project-743aab84-f9a5-4ec7-954.ppp_rico.ppp_up_to_150k`
     ),
     joined AS (
         SELECT 

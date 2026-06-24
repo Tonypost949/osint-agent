@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 import json
 import datetime
@@ -14,7 +14,7 @@ from googleapiclient.discovery import build
 from google.cloud import bigquery
 
 # CONFIG
-GCP_PROJECT = os.environ.get("GOOGLE_PROJECT_ID", "noble-beanbag-497411-m4")
+GCP_PROJECT = os.environ.get("GOOGLE_PROJECT_ID", "project-743aab84-f9a5-4ec7-954")
 BQ_DATASET = "national_audits"
 BQ_TABLE = "gmail_index"
 FULL_TABLE_ID = f"{GCP_PROJECT}.{BQ_DATASET}.{BQ_TABLE}"

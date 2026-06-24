@@ -1,4 +1,4 @@
-"""
+﻿"""
 azure_transcribe_audio.py — Transcribe mp3/m4a evidence files via Azure Speech + pipe to BigQuery.
 Requires: azure_config.json or AZURE_SPEECH_KEY / AZURE_SPEECH_REGION env vars.
 Run: python azure_transcribe_audio.py
@@ -17,7 +17,7 @@ for p in [config_path, alt]:
 
 key = config.get("speech_key") or os.environ.get("AZURE_SPEECH_KEY")
 region = config.get("speech_region") or os.environ.get("AZURE_SPEECH_REGION") or "westus2"
-PROJECT = "noble-beanbag-497411-m4"
+PROJECT = "project-743aab84-f9a5-4ec7-954"
 
 if not key:
     print("Azure Speech not configured. Run azure_setup.py --provision first.")

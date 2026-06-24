@@ -1,4 +1,4 @@
-import os
+﻿import os
 import base64
 from email.message import EmailMessage
 from google.oauth2.credentials import Credentials
@@ -77,7 +77,25 @@ def send_email():
     try:
         service = build('gmail', 'v1', credentials=creds)
         message = EmailMessage()
-        message.set_content(MERMAID_GRAPH)
+        
+        full_content = (
+            "Here are the exact, full URLs for your OSINT Command Center:\n\n"
+            "1. The Master GitHub Evidence Repository:\n"
+            "https://github.com/Tonypost949/osint-agent\n\n"
+            "2. The GIS Maps (Viewable via GitHub):\n"
+            "Nationwide Pipeline Map:\n"
+            "https://github.com/Tonypost949/osint-agent/blob/master/nationwide_pipeline_map.html\n"
+            "Local OC / Hexavalent Plume Map:\n"
+            "https://github.com/Tonypost949/osint-agent/blob/master/osint_gemini_gis.html\n\n"
+            "3. The Congressional Briefing Exhibit:\n"
+            "https://github.com/Tonypost949/osint-agent/blob/master/FEDERAL_WHISTLEBLOWER_EXHIBIT.md\n\n"
+            "4. Google Cloud Console for BigQuery Backups:\n"
+            "https://console.cloud.google.com/bigquery?project=project-743aab84-f9a5-4ec7-954&ws=!1m5!1m4!4m3!1sproject-743aab84-f9a5-4ec7-954!2snational_audits!3sdrive_file_index\n\n"
+            "---\n\n"
+            + MERMAID_GRAPH
+        )
+        
+        message.set_content(full_content)
         message['To'] = 'txtdjdrop@gmail.com'
         message['From'] = 'txtdjdrop@gmail.com'
         message['Subject'] = 'OSINT Zeus: Vanguard RICO Network Architecture Graph'

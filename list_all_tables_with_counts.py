@@ -1,6 +1,6 @@
-from google.cloud import bigquery
+﻿from google.cloud import bigquery
 
-GCP_PROJECT = "noble-beanbag-497411-m4"
+GCP_PROJECT = "project-743aab84-f9a5-4ec7-954"
 
 def list_all():
     client = bigquery.Client(project=GCP_PROJECT)

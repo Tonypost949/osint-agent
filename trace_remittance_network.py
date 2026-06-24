@@ -1,8 +1,8 @@
-import os
+﻿import os
 import csv
 from google.cloud import bigquery
 
-GCP_PROJECT_ID = "noble-beanbag-497411-m4"
+GCP_PROJECT_ID = "project-743aab84-f9a5-4ec7-954"
 BQ_TABLE = f"{GCP_PROJECT_ID}.national_audits.all_state_records"
 
 def trace_foreign_remittances():
