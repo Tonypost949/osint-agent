@@ -16,3 +16,5 @@ tiles_temp/
 *.log
 Makaveli_Conversation_Log.jsonl
 Makaveli_Conversation_Log.jsonl
+
+ag_mission_backup.jsonl
