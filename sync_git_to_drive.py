@@ -31,8 +31,13 @@ def get_drive_service():
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             logging.info("Refreshing credentials...")
-            creds.refresh(Request())
-        else:
+            try:
+                creds.refresh(Request())
+            except Exception as e:
+                logging.warning(f"Failed to refresh credentials: {e}. Re-authenticating...")
+                creds = None
+        
+        if not creds:
             logging.info("Starting OAuth flow...")
             flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRETS_FILE, SCOPES)
             creds = flow.run_local_server(port=0)
@@ -48,9 +53,11 @@ def zip_project(source_dir, output_filename):
                 dirs.remove('.git')
             if '__pycache__' in dirs:
                 dirs.remove('__pycache__')
+            if 'venv' in dirs:
+                dirs.remove('venv')
             for file in files:
-                # Do not zip the zip file itself
-                if file == os.path.basename(output_filename):
+                # Do not zip the zip file itself or other huge zip files
+                if file == os.path.basename(output_filename) or file.endswith('.zip'):
                     continue
                 file_path = os.path.join(root, file)
                 arcname = os.path.relpath(file_path, start=source_dir)
@@ -92,7 +99,9 @@ def main():
         logging.info(f"Cleaned up local zip file {zip_filename}.")
         
     except Exception as e:
+        import traceback
         logging.error(f"Sync process failed: {e}")
+        traceback.print_exc()
         if os.path.exists(zip_filepath):
             os.remove(zip_filepath)
             

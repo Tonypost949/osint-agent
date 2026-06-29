@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Adobe Bulk Download</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+      line-height: 1.7;
+      color: #1a1a1a;
+      background: #fafafa;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      padding: 2.5rem 3rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      color: #111;
+    }
+
+    .meta {
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+      color: #222;
+    }
+
+    p, li {
+      font-size: 0.95rem;
+      color: #333;
+    }
+
+    p {
+      margin-bottom: 0.75rem;
+    }
+
+    ul {
+      margin: 0.5rem 0 1rem 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.35rem;
+    }
+
+    code {
+      font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, monospace;
+      font-size: 0.85em;
+      background: #f0f0f0;
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid #e0e0e0;
+    }
+
+    th {
+      background: #f7f7f7;
+      font-weight: 600;
+      color: #222;
+    }
+
+    td {
+      color: #444;
+    }
+
+    .highlight {
+      background: #f0f7f0;
+      border-left: 3px solid #2e7d32;
+      padding: 0.75rem 1rem;
+      margin: 1rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .highlight p {
+      margin: 0;
+      font-weight: 500;
+      color: #2e7d32;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid #e5e5e5;
+      font-size: 0.8rem;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Privacy Policy</h1>
+    <div class="meta">
+      <strong>Adobe Bulk Download</strong> &mdash; Version 2.0.0<br>
+      Last updated: March 19, 2026
+    </div>
+
+    <h2>Overview</h2>
+    <p>
+      Adobe Bulk Download is a Chrome extension that helps you download your own
+      files from Adobe Creative Cloud in bulk. This policy explains what data the
+      extension accesses, how it is stored, and what it does <em>not</em> do.
+    </p>
+
+    <div class="highlight">
+      <p>
+        This extension collects no analytics, telemetry, or tracking data.
+        It does not use cookies. The only data shared with external services
+        is voluntary feedback you choose to submit and license verification
+        for paid users.
+      </p>
+    </div>
+
+    <h2>Data Accessed</h2>
+    <p>
+      The extension accesses only your own Adobe Creative Cloud files through
+      official Adobe APIs. It does not access files belonging to other users,
+      and it does not access any data outside the Adobe ecosystem.
+    </p>
+    <ul>
+      <li>
+        <strong>Adobe authentication token</strong> &mdash; read from
+        <code>window.adobeIMS</code> on Adobe pages you are already signed in
+        to. This token is the same session credential your browser already holds;
+        the extension simply relays it to its background service worker so it can
+        call Adobe APIs on your behalf.
+      </li>
+      <li>
+        <strong>File metadata</strong> &mdash; folder listings and asset
+        metadata returned by Adobe's cloud-storage and conversion APIs
+        (<code>*.adobe.io</code>).
+      </li>
+      <li>
+        <strong>File content</strong> &mdash; the actual bytes of your files,
+        downloaded for saving to your local disk.
+      </li>
+    </ul>
+
+    <h2>Authentication Token Handling</h2>
+    <ul>
+      <li>
+        The token is stored exclusively in
+        <code>chrome.storage.session</code>, which is an in-memory store that is
+        automatically cleared when the browser is closed.
+      </li>
+      <li>
+        The token is never written to disk, never sent to any server other than
+        <code>*.adobe.io</code> / <code>*.adobe.com</code>, and never
+        exfiltrated.
+      </li>
+      <li>
+        The token is validated (JWT format check) before being accepted.
+      </li>
+    </ul>
+
+    <h2>Local Storage</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Storage Area</th>
+          <th>Purpose</th>
+          <th>Retention</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>chrome.storage.session</code></td>
+          <td>Authentication token, active task state</td>
+          <td>Cleared on browser close (in-memory only)</td>
+        </tr>
+        <tr>
+          <td><code>chrome.storage.local</code></td>
+          <td>Download progress state, license status, free file count</td>
+          <td>24-hour TTL for progress; license and count persist until uninstall</td>
+        </tr>
+        <tr>
+          <td><code>chrome.storage.sync</code></td>
+          <td>User preferences (concurrency, theme), anonymous user ID (UUID)</td>
+          <td>Persists until user changes or uninstalls</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Network Requests</h2>
+    <p>
+      The extension makes network requests to the following domains:
+    </p>
+    <ul>
+      <li><code>https://*.adobe.io</code> &mdash; Adobe cloud storage and file
+        conversion APIs</li>
+      <li><code>https://*.adobe.com</code> &mdash; Adobe authentication and
+        asset services</li>
+      <li><code>https://abd-license-api.the-pharmer.workers.dev</code> &mdash;
+        License verification for paid users (see Licensing below)</li>
+    </ul>
+    <p>
+      There are no analytics endpoints and no telemetry servers. The only
+      additional network requests occur when you voluntarily submit feedback
+      (see Feedback &amp; Surveys below).
+    </p>
+
+    <h2>Permissions Used</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Permission</th>
+          <th>Why It Is Needed</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>storage</code></td>
+          <td>Save download progress and user preferences locally</td>
+        </tr>
+        <tr>
+          <td><code>downloads</code></td>
+          <td>Save downloaded files to your computer's download folder</td>
+        </tr>
+        <tr>
+          <td><code>alarms</code></td>
+          <td>Keep the service worker alive during long download operations</td>
+        </tr>
+        <tr>
+          <td><code>sidePanel</code></td>
+          <td>Display the main user interface in Chrome's side panel</td>
+        </tr>
+        <tr>
+          <td><code>notifications</code></td>
+          <td>Notify you when a bulk download completes</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Host Permissions</h2>
+    <p>
+      The extension requests access to <code>https://*.adobe.io/*</code> and
+      <code>https://*.adobe.com/*</code>. These are required to:
+    </p>
+    <ul>
+      <li>
+        Call Adobe's cloud storage APIs to list and download your files.
+      </li>
+      <li>
+        Extract your existing authentication token from Adobe pages you are
+        signed in to.
+      </li>
+    </ul>
+    <p>
+      Content scripts run only on <code>https://assets.adobe.com/*</code> and
+      <code>https://acrobat.adobe.com/*</code> to detect your login session.
+    </p>
+
+    <h2>Licensing &amp; Payment</h2>
+    <p>
+      Adobe Bulk Download offers a free tier (50 files per session) and a paid
+      lifetime license ($19 one-time purchase via Stripe).
+    </p>
+    <ul>
+      <li>
+        <strong>Anonymous user ID</strong> &mdash; a randomly generated UUID
+        stored in <code>chrome.storage.sync</code>. This ID contains no
+        personal information and is used solely to associate your license with
+        your browser. It is sent to our license verification server and to
+        Stripe as a checkout reference.
+      </li>
+      <li>
+        <strong>License verification</strong> &mdash; when checking license
+        status, the extension sends only your anonymous user ID to our
+        Cloudflare Worker (<code>abd-license-api.the-pharmer.workers.dev</code>).
+        No other data is transmitted.
+      </li>
+      <li>
+        <strong>Payment processing</strong> &mdash; payments are handled
+        entirely by <a href="https://stripe.com/privacy">Stripe</a>. We do not
+        receive, process, or store your credit card number, billing address, or
+        other payment details. Stripe notifies our server only that a payment
+        succeeded, along with the anonymous user ID.
+      </li>
+    </ul>
+
+    <h2>Feedback &amp; Surveys</h2>
+    <p>
+      The extension provides two optional ways to share feedback. Both are
+      entirely voluntary &mdash; no data is collected unless you choose to
+      submit.
+    </p>
+    <ul>
+      <li>
+        <strong>Send Feedback form</strong> &mdash; opens a Google Form in a
+        new tab. Your extension version, Chrome version, platform, and license
+        status are pre-filled in the URL to help us diagnose issues. Your
+        responses are stored in Google Sheets. If you provide your email
+        address, it is used only to follow up on your feedback.
+      </li>
+      <li>
+        <strong>Uninstall survey</strong> &mdash; if you uninstall the
+        extension, a short survey page opens on
+        <code>saltydalton.com</code>. It asks for the reason you
+        uninstalled and an optional email. Your extension version, anonymous
+        user ID, and license status are included in the submission. Responses
+        are sent to Google Apps Script and stored in Google Sheets.
+      </li>
+    </ul>
+    <p>
+      Feedback data is used only to improve the extension. It is never sold,
+      shared with advertisers, or used for any purpose other than product
+      improvement and responding to your inquiry.
+    </p>
+
+    <h2>What This Extension Does NOT Do</h2>
+    <ul>
+      <li>Does not collect or transmit analytics or telemetry</li>
+      <li>Does not use cookies or set any tracking identifiers</li>
+      <li>Does not sell or share your data with advertisers or data brokers</li>
+      <li>Does not access browsing history or any non-Adobe websites</li>
+      <li>Does not modify any files in your Adobe Creative Cloud account</li>
+      <li>Does not store your password (the token comes from your existing
+        browser session)</li>
+      <li>Does not perform network requests or process files in the background when not actively scanning or
+        downloading</li>
+    </ul>
+
+    <h2>User Control</h2>
+    <p>
+      You can revoke all data and permissions at any time by uninstalling the
+      extension. All session data is cleared automatically when you close your
+      browser. Preferences stored in <code>chrome.storage.sync</code> are
+      removed upon uninstall.
+    </p>
+
+    <h2>Changes to This Policy</h2>
+    <p>
+      If this privacy policy is updated, the "Last updated" date at the top of
+      this page will be changed. Significant changes will be noted in the
+      extension's changelog.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      If you have questions about this privacy policy, use the "Send Feedback"
+      link in the extension or visit
+      <a href="https://saltydalton.com/abd/">saltydalton.com/abd</a>.
+    </p>
+
+    <footer>
+      Adobe Bulk Download v2.0.0 &mdash; This extension is not affiliated with,
+      endorsed by, or sponsored by Adobe Inc. "Adobe" and "Creative Cloud" are
+      trademarks of Adobe Inc.
+    </footer>
+  </div>
+</body>
+</html>

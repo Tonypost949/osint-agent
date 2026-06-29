@@ -24,7 +24,7 @@ Build a complete RICO connection case against the City of Huntington Beach by cr
 ## What Was Done Today
 
 ### BigQuery Access Established
-- Project: `noble-beanbag-497411-m4`
+- Project: `project-743aab84-f9a5-4ec7-954`
 - IAM: `amd949609@gmail.com` granted `roles/bigquery.admin`
 - All 5 datasets confirmed accessible: `ppp_rico`, `hb_church_osint`, `national_audits`, `nppes_export`, `ai_sandbox`
 - PPP pipeline (`pipeline.py`) running in background, enriching `ppp_150k_plus` (968,524 rows loaded)

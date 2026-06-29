@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adobe Bulk Download</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body data-status="idle">
+  <header>
+    <span id="token-badge" data-connected="false" title="Open Adobe Creative Cloud and sign in">Sign in to Adobe</span>
+    <span id="license-badge" hidden>Licensed</span>
+  </header>
+
+  <main>
+    <div id="panel-fixed-top">
+      <section id="hero">
+        <output id="file-count" aria-live="polite">0 / 0</output>
+        <progress id="progress-bar" value="0" max="100"></progress>
+        <small id="phase-label" aria-label="Download phase"></small>
+        <small id="eta-label" aria-label="Time remaining">Idle</small>
+        <small id="hero-error-count" aria-live="polite" hidden></small>
+      </section>
+
+      <section id="stats-row">
+        <span id="stat-speed">&mdash;</span>
+        <span id="stat-data">&mdash;</span>
+      </section>
+
+      <div id="empty-state">
+        <img id="empty-state-icon" src="abd-icon.svg" alt="Adobe Bulk Download" width="96" height="96">
+        <div id="empty-state-heading">Ready to scan</div>
+        <div id="empty-state-subtitle">Finds all of your files on Adobe Cloud Storage</div>
+      </div>
+
+      <nav id="controls">
+        <button id="btn-scan" type="button" aria-label="Start scanning"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Start Scan</button>
+        <button id="btn-download" type="button" aria-label="Start download">Download All</button>
+        <button id="btn-pause" type="button" aria-label="Pause download">Pause</button>
+        <button id="btn-resume" type="button" aria-label="Resume download">Resume</button>
+        <button id="btn-stop" type="button" aria-label="Stop current operation">Stop</button>
+        <button id="btn-retry" type="button" aria-label="Retry failed downloads">Retry Failed</button>
+      </nav>
+    </div>
+
+    <div id="panel-scroll">
+      <div id="worker-strip" role="status" aria-label="Download worker status" hidden></div>
+
+      <h3 id="log-header" hidden>Activity</h3>
+      <section id="log-area" role="log" aria-live="polite" hidden></section>
+
+      <details id="failed-files" hidden>
+        <summary>Failed Files (<span id="failed-count">0</span>)</summary>
+        <div id="failed-list"></div>
+        <button id="btn-export-errors" type="button">Export Error Log</button>
+      </details>
+    </div>
+
+    <dialog id="resume-dialog" aria-labelledby="resume-dialog-title">
+      <h3 id="resume-dialog-title">Previous Session Found</h3>
+      <p id="resume-message"></p>
+      <small class="resume-note">Previously downloaded files will be skipped based on the last session's scan data.</small>
+      <footer>
+        <button id="btn-fresh" type="button">Start Fresh</button>
+        <button id="btn-dialog-resume" type="button">Resume</button>
+      </footer>
+    </dialog>
+
+    <dialog id="upgrade-dialog" aria-labelledby="upgrade-dialog-title">
+      <h3 id="upgrade-dialog-title">Your first 50 files are ready</h3>
+      <p id="upgrade-message">The free tier tops out at 50 files. Upgrade once for $19 to download your full library — no subscription, no limits.</p>
+      <small class="upgrade-note">$19 is a one-time purchase. Nothing recurring, nothing hidden.</small>
+      <footer>
+        <button id="btn-upgrade-later" type="button">Not now</button>
+        <button id="btn-upgrade" type="button">Upgrade — $19</button>
+      </footer>
+    </dialog>
+
+    <dialog id="email-dialog" aria-labelledby="email-dialog-title">
+      <h3 id="email-dialog-title">Restore your license</h3>
+      <p>Enter the email address you used when purchasing Adobe Bulk Download.</p>
+      <input type="email" id="email-input" placeholder="you@example.com" autocomplete="email" />
+      <footer>
+        <button id="btn-email-cancel" type="button">Cancel</button>
+        <button id="btn-email-confirm" type="button">Verify</button>
+      </footer>
+    </dialog>
+  </main>
+
+  <div id="panel-bottom-bar">
+    <a id="link-feedback" href="#" tabindex="0">Send Feedback</a>
+    <button id="btn-settings-gear" type="button" aria-label="Settings">
+      <img src="settings-icon.svg" alt="" width="20" height="20">
+    </button>
+  </div>
+
+  <div id="settings-drawer" class="drawer-closed" inert>
+    <div id="settings-drawer-header">
+      <span>Settings</span>
+      <button id="btn-settings-close" type="button" aria-label="Close settings">&times;</button>
+    </div>
+    <div id="settings-drawer-body">
+      <label>Theme
+        <select id="theme-select">
+          <option value="">Auto (system)</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+      <label>Download folder
+        <input type="text" id="subfolder-input" placeholder="Clear for default Downloads folder" maxlength="100">
+      </label>
+      <div class="settings-divider"></div>
+      <span class="settings-group-label">Advanced</span>
+      <label>Concurrent downloads
+        <select id="concurrency-select">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10" selected>10</option>
+        </select>
+      </label>
+      <label>Diagnostic level
+        <select id="diag-level-select">
+          <option value="DEBUG">DEBUG</option>
+          <option value="INFO" selected>INFO</option>
+          <option value="WARN">WARN</option>
+          <option value="ERROR">ERROR</option>
+        </select>
+      </label>
+      <button id="btn-export-diagnostics" type="button">Export Diagnostics</button>
+      <div id="drawer-footer-row">
+        <a id="link-restore-license" href="#" tabindex="0">Restore License</a>
+        <span id="drawer-version"></span>
+      </div>
+    </div>
+  </div>
+  <div id="settings-backdrop" hidden></div>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>
