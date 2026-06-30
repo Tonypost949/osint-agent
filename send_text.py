@@ -47,6 +47,8 @@ def send_text_message():
         # Keep SMS body short and simple
         message.set_content(
             "Zeus Links:\n"
+            "Dashboard (Wi-Fi): http://192.168.1.121:8501\n"
+            "Dashboard (Tailscale): http://100.103.157.60:8501\n"
             "Repo: https://github.com/Tonypost949/osint-agent\n"
             "Exhibit: https://github.com/Tonypost949/osint-agent/blob/master/FEDERAL_WHISTLEBLOWER_EXHIBIT.md\n"
             "OC Map: https://github.com/Tonypost949/osint-agent/blob/master/osint_gemini_gis.html"

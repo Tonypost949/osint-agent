@@ -1,4 +1,4 @@
-﻿import os
+import os
 import base64
 from email.message import EmailMessage
 from google.oauth2.credentials import Credentials
@@ -80,6 +80,9 @@ def send_email():
         
         full_content = (
             "Here are the exact, full URLs for your OSINT Command Center:\n\n"
+            "=== NEW MOBILE ACCESS ===\n"
+            "Streamlit Dashboard (Local Wi-Fi): http://192.168.1.121:8501\n"
+            "Streamlit Dashboard (Tailscale): http://100.103.157.60:8501\n\n"
             "1. The Master GitHub Evidence Repository:\n"
             "https://github.com/Tonypost949/osint-agent\n\n"
             "2. The GIS Maps (Viewable via GitHub):\n"
