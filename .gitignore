@@ -18,3 +18,8 @@ Makaveli_Conversation_Log.jsonl
 Makaveli_Conversation_Log.jsonl
 
 ag_mission_backup.jsonl
+opencode_session_*.html
+*.html
+/uploads/
+/tablet_documents/
+/tablet_files/
