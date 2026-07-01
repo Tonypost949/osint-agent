@@ -75,7 +75,7 @@ def load_data(query):
     client = bigquery.Client(project='project-743aab84-f9a5-4ec7-954')
     return client.query(query).to_dataframe()
 
-tab1, tab2, tab3, tab4 = st.tabs(["Overview", "Cyber Recon", "Regional LLCs", "OSINTNeoAi Chat"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Overview", "Cyber Recon", "Regional LLCs", "I-Soon Telemetry", "OSINTNeoAi Chat"])
 
 with tab1:
     st.subheader("RICO Operations Overview")
@@ -110,65 +110,119 @@ with tab3:
         st.error(f"Error loading LLC data: {e}")
 
 with tab4:
-    st.subheader("OSINTNeoAi Assistant")
-    st.write("Chat directly with your evidence vault.")
+    st.subheader("I-Soon Telecom Telemetry")
+    st.write("Ingested cellular telemetry datasets from the Sichuan I-Soon (Anxun) leaks.")
     
-    # Initialize Gemini client
+    dataset_choice = st.selectbox(
+        "Select Telemetry Dataset",
+        ["Beeline CRM (Subscriber Profiles)", "Beeline LBS (Location Logs)", "Beeline CDR (Call Records)", "IDNet Database"]
+    )
+    
+    table_mapping = {
+        "Beeline CRM (Subscriber Profiles)": "ppp_rico.beeline_crm",
+        "Beeline LBS (Location Logs)": "ppp_rico.beeline_lbs",
+        "Beeline CDR (Call Records)": "ppp_rico.beeline_cdr",
+        "IDNet Database": "ppp_rico.idnet"
+    }
+    
     try:
-        from google import genai
-        genai_client = genai.Client()
+        selected_table = table_mapping[dataset_choice]
+        df_telemetry = load_data(f"SELECT * FROM {selected_table} LIMIT 250")
+        st.dataframe(df_telemetry, use_container_width=True)
     except Exception as e:
-        st.error(f"Error loading Gemini SDK: {e}")
-        genai_client = None
+        st.error(f"Error loading telemetry: {e}")
 
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-    if "prev_interaction_id" not in st.session_state:
-        st.session_state.prev_interaction_id = None
-
-    for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
-
-    if prompt := st.chat_input("Ask OSINTNeoAi about the RICO data..."):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
+with tab5:
+    st.subheader("OSINTNeoAi Assistant & Query Runner")
+    
+    col_chat, col_sql = st.columns([1, 1])
+    
+    with col_chat:
+        st.markdown("### 💬 AI Assistant")
+        st.write("Ask questions or generate SQL queries.")
         
-        with st.chat_message("assistant"):
-            if genai_client:
-                with st.spinner("OSINTNeoAi is thinking..."):
-                    try:
-                        system_instruction = (
-                            "You are OSINTNeoAi, an OSINT and RICO investigation assistant. "
-                            "You are connected to a BigQuery dataset `ppp_rico` in project `project-743aab84-f9a5-4ec7-954`. "
-                            "The user is investigating a network involving Mercy House shelters, Medi-Cal billing fraud, and PPP fraud. "
-                            "The tables in the dataset are:\n"
-                            "1. `city_cyber_recon`: Contains exposed administrative paths found on city/police domains.\n"
-                            "2. `regional_llcs`: Contains regional LLCs mapped to the investigation.\n"
-                            "3. `trafficking_matches`: Matches of targets Carmen Luege, Victor Nunez, Paul Barnes.\n\n"
-                            "Answer the user's questions about the investigation using this context. "
-                            "If they ask for data or queries, write SQL queries they can run on these tables."
-                        )
-                        
-                        kwargs = {
-                            "model": "gemini-3.5-flash",
-                            "input": prompt,
-                            "system_instruction": system_instruction
-                        }
-                        if st.session_state.prev_interaction_id:
-                            kwargs["previous_interaction_id"] = st.session_state.prev_interaction_id
+        # Initialize Gemini client
+        try:
+            from google import genai
+            genai_client = genai.Client()
+        except Exception as e:
+            st.error(f"Error loading Gemini SDK: {e}")
+            genai_client = None
 
-                        interaction = genai_client.interactions.create(**kwargs)
-                        
-                        # Store context ID for conversation memory
-                        st.session_state.prev_interaction_id = interaction.id
-                        
-                        response = interaction.output_text or "No response received."
-                    except Exception as e:
-                        response = f"Error calling Gemini API: {e}"
-            else:
-                response = "Gemini client is not initialized. Please verify your SDK and API Key configuration."
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
+        if "prev_interaction_id" not in st.session_state:
+            st.session_state.prev_interaction_id = None
 
-            st.markdown(response)
-            st.session_state.messages.append({"role": "assistant", "content": response})
+        # Container for chat messages with fixed height using custom CSS if needed
+        chat_container = st.container(height=400)
+        with chat_container:
+            for msg in st.session_state.messages:
+                with st.chat_message(msg["role"]):
+                    st.markdown(msg["content"])
+
+        if prompt := st.chat_input("Ask OSINTNeoAi about the RICO data..."):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            with chat_container:
+                with st.chat_message("user"):
+                    st.markdown(prompt)
+            
+            with chat_container:
+                with st.chat_message("assistant"):
+                    if genai_client:
+                        with st.spinner("OSINTNeoAi is thinking..."):
+                            try:
+                                system_instruction = (
+                                    "You are OSINTNeoAi, an OSINT and RICO investigation assistant. "
+                                    "You are connected to a BigQuery dataset `ppp_rico` in project `project-743aab84-f9a5-4ec7-954`. "
+                                    "The user is investigating a network involving Mercy House shelters, Medi-Cal billing fraud, and PPP fraud. "
+                                    "The tables in the dataset are:\n"
+                                    "1. `city_cyber_recon`: Contains exposed administrative paths found on city/police domains.\n"
+                                    "2. `regional_llcs`: Contains regional LLCs mapped to the investigation.\n"
+                                    "3. `trafficking_matches`: Matches of targets Carmen Luege, Victor Nunez, Paul Barnes.\n\n"
+                                    "Answer the user's questions about the investigation using this context. "
+                                    "CRITICAL: If they ask for data or queries, write SQL queries they can run on these tables. Do NOT make up or simulate query results; tell the user to copy the query and paste it into the SQL Query Runner on the right to get real results."
+                                )
+                                
+                                kwargs = {
+                                    "model": "gemini-3.5-flash",
+                                    "input": prompt,
+                                    "system_instruction": system_instruction
+                                }
+                                if st.session_state.prev_interaction_id:
+                                    kwargs["previous_interaction_id"] = st.session_state.prev_interaction_id
+
+                                interaction = genai_client.interactions.create(**kwargs)
+                                st.session_state.prev_interaction_id = interaction.id
+                                response = interaction.output_text or "No response received."
+                                # Log to file
+                                try:
+                                    log_path = "chatbot_findings_log.md"
+                                    with open(log_path, "a", encoding="utf-8") as lf:
+                                        lf.write(f"## User Query\n{prompt}\n\n## Assistant Response\n{response}\n\n---\n\n")
+                                except Exception:
+                                    pass
+                            except Exception as e:
+                                response = f"Error calling Gemini API: {e}"
+                    else:
+                        response = "Gemini client is not initialized. Please verify your SDK and API Key configuration."
+
+                    st.markdown(response)
+                    st.session_state.messages.append({"role": "assistant", "content": response})
+
+    with col_sql:
+        st.markdown("### 🔍 Live BigQuery SQL Runner")
+        st.write("Run real-time SQL queries against the `project-743aab84-f9a5-4ec7-954` project.")
+        
+        default_query = "SELECT * FROM `project-743aab84-f9a5-4ec7-954.ppp_rico.trafficking_matches` LIMIT 10"
+        query_input = st.text_area("Enter SQL Query:", value=default_query, height=150)
+        
+        if st.button("Run SQL Query", use_container_width=True):
+            with st.spinner("Executing query on BigQuery..."):
+                try:
+                    df_res = load_data(query_input)
+                    st.success(f"Success! Returned {len(df_res)} rows.")
+                    st.dataframe(df_res, use_container_width=True)
+                except Exception as e:
+                    st.error(f"SQL Execution Error: {e}")
+
