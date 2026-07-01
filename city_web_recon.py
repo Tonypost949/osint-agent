@@ -8,14 +8,14 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 bq = bigquery.Client()
 project_dataset = 'project-743aab84-f9a5-4ec7-954.ppp_rico'
 
-# Complete 68-domain list from "html big search.html"
+# Complete domain list from "html big search.html" (+www variants)
 city_domains = [
     # --- 39 States + DC + PR ---
-    'alabama.gov',
+    'alabama.gov', 'www.alabama.gov',
     'alaska.gov',
     'arizona.gov',
     'arkansas.gov',
-    'ca.gov',
+    'ca.gov', 'www.ca.gov',
     'colorado.gov',
     'ct.gov',
     'delaware.gov',
@@ -23,10 +23,10 @@ city_domains = [
     'georgia.gov',
     'hawaii.gov',
     'idaho.gov',
-    'illinois.gov',
+    'illinois.gov', 'www.illinois.gov',
     'in.gov',
-    'iowa.gov',
-    'kansas.gov',
+    'iowa.gov', 'www.iowa.gov',
+    'kansas.gov', 'www.kansas.gov',
     'louisiana.gov',
     'michigan.gov',
     'mn.gov',
@@ -36,41 +36,46 @@ city_domains = [
     'newmexico.gov',
     'ny.gov',
     'nc.gov',
-    'nd.gov',
+    'nd.gov', 'www.nd.gov',
     'ohio.gov',
     'ok.gov',
-    'oregon.gov',
+    'oregon.gov', 'www.oregon.gov',
     'pa.gov',
-    'ri.gov',
-    'tn.gov',
+    'ri.gov', 'www.ri.gov',
+    'tn.gov', 'www.tn.gov',
     'texas.gov',
     'utah.gov',
     'virginia.gov',
     'wa.gov',
-    'wisconsin.gov',
-    'wv.gov',
+    'wisconsin.gov', 'www.wisconsin.gov',
+    'wv.gov', 'www.wv.gov',
     'wy.gov',
     'pr.gov',
 
     # --- Huntington Beach ---
     'hbpd.org',
+    'hbfd.org', 'www.hbfd.org',
     'huntingtonbeachca.gov',
     'volunteer.huntingtonbeachca.gov',
-    'huntingtonbeachcu.org',
+    'huntingtonbeachcu.org', 'www.huntingtonbeachcu.org',
+    'hbchamber.com',
 
     # --- Newport Beach ---
     'newportbeachca.gov',
-    'nbpd.org',
+    'nbpd.org', 'www.nbpd.org',
+    'nbchamber.com',
 
     # --- Santa Monica ---
     'santamonica.gov',
     'santamonicapd.org',
-    'joinsmpd.com',
+    'joinsmpd.com', 'www.joinsmpd.com',
+    'smchamber.com',
 
     # --- Irvine ---
     'cityofirvine.org',
     'irvinepd.org',
     'joinirvinepd.gov',
+    'irvinechamber.com',
 
     # --- RICO-connected cities ---
     'sanpedroca.gov',
@@ -79,20 +84,28 @@ city_domains = [
     'ocgov.com',
     'orangecountyca.gov',
     'santaana.gov',
-    'santa-ana.org',      # From intermediate run
-    'santaanapd.org',     # From intermediate run
-    'costamesaca.gov',    # From intermediate run
-    'cmpd.org',           # From intermediate run
+    'santa-ana.org',
+    'santaanapd.org',
+    'costamesaca.gov', 'www.costamesaca.gov',
+    'costamesachamber.com', 'www.costamesachamber.com',
+    'cmpd.org',
     'anaheim.net',
+    'anaheimpd.org',
+    'anaheimchamber.com',
     'fullertoncity.com',
-    'fullertonca.gov',    # From intermediate run
+    'fullertonca.gov',
+    'fullertonpd.org',
+    'fullertonfd.org',
+    'fullertonchamber.com',
     'garden-grove.org',
+    'ggpd.org',           # Police dept
+    'ggchamber.com',
     'lapd.org',
     'sheriff.lacounty.gov',
 
     # --- Southern California Edison ---
     'sce.com',
-    'edison.com',
+    'edison.com', 'www.edison.com',
 
     # --- Turkey (National) ---
     'egm.gov.tr',
