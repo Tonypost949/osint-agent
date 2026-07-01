@@ -14,7 +14,7 @@ from google.auth.transport.requests import Request
 # -------------------------- CONFIGURATION ----------------------------
 # ----------------------------------------------------------------------
 # 1. Folder on your PC you want to back up
-SOURCE_DIR = r"C:\Users\HP\.gemini\antigravity-ide\brain\c370d570-1fbc-427b-a511-94af4ff83ad7"
+SOURCE_DIR = r"C:\Users\HP\.gemini\antigravity-ide\brain\52e78ece-a12b-4269-b588-efb7b8d709c2"
 
 # 2. Delete the local file after a successful upload? (True = move, False = copy)
 DELETE_AFTER_UPLOAD = False

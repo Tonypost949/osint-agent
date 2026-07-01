@@ -1,116 +1,43 @@
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import os
-import base64
-from email.message import EmailMessage
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from googleapiclient.discovery import build
 
-SCOPES = ['https://www.googleapis.com/auth/gmail.send']
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CLIENT_SECRET_FILE = os.path.join(SCRIPT_DIR, "client_secret.json")
-TOKEN_FILE = os.path.join(SCRIPT_DIR, "token_send.json")
+# Configuration for automated email alerts using generated app password
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+SENDER_EMAIL = "amd949609@gmail.com"
+APP_PASSWORD = "iwen bfmr awdq yvin" # Generated app password
 
-MERMAID_GRAPH = """
-# The Vanguard Syndicate: National Scale & Network Architecture
-
-```mermaid
-graph TD
-    classDef orchestrator fill:#4a0000,stroke:#ff0000,stroke-width:2px,color:#fff;
-    classDef political fill:#002244,stroke:#0066cc,stroke-width:2px,color:#fff;
-    classDef shell fill:#333333,stroke:#ffcc00,stroke-width:2px,color:#fff;
-    classDef physical fill:#003300,stroke:#00ff00,stroke-width:2px,color:#fff;
-    classDef victim fill:#222222,stroke:#ff6600,stroke-width:2px,stroke-dasharray: 5 5,color:#fff;
-
-    subgraph Core_Orchestrators [The Apex/Orchestrators]
-        VAS[VAS / Vanguard of the Old]:::orchestrator
-        DOJ_Target[Federal Indictment Targets / UFC]:::orchestrator
-    end
-
-    subgraph Political_Enablers [Political & Financial Cover]
-        Andrew_Do[Supervisor Andrew Do]:::political
-        HB_City[City of Huntington Beach]:::political
-        State_Exemptions[Fraudulent CEQA Exemptions]:::political
-    end
-
-    subgraph Operational_Shells [The Contractors & Shell Entities]
-        RPM[RPM Team / RPM Modular]:::shell
-        Mercy[Mercy House]:::shell
-        VAS_Subsidiaries[VAS Local LLCs]:::shell
-    end
-
-    subgraph Physical_Execution [The Physical Crime Scene]
-        HBNC[Huntington Beach Navigation Center]:::physical
-        Toxic_Plume[Hexavalent Chromium & Arsenic Plume]:::physical
-        Failed_Cap[1-Year Asphalt Cap]:::physical
-    end
-
-    VAS --> |Directs/Funds| DOJ_Target
-    VAS --> |Launders through| VAS_Subsidiaries
-    DOJ_Target --> |Influence| Andrew_Do
-    Andrew_Do --> |Directs $2.2M Contracts| RPM
-    Andrew_Do --> |Political Pressure| HB_City
-    HB_City --> |Files Fraudulent Paperwork| State_Exemptions
-    State_Exemptions --> |Bypasses DTSC| HBNC
-    RPM --> |Builds| HBNC
-    Mercy --> |Operates| HBNC
-    VAS_Subsidiaries --> |Funnel Money| Mercy
-    Toxic_Plume --> |Located beneath| HBNC
-    HBNC --> |Cheap Encapsulation| Failed_Cap
-```
-"""
-
-def send_email():
-    creds = None
-    if os.path.exists(TOKEN_FILE):
-        creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            print("[AUTH] Launching browser to authorize sending email...")
-            flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open(TOKEN_FILE, 'w') as token:
-            token.write(creds.to_json())
-
+def send_evidence_alert(subject, body_content, recipient="txtdjdrop@gmail.com"):
+    print("=" * 60)
+    print("  INITIATING SECURE EMAIL NOTIFICATION  ")
+    print("=" * 60)
+    
+    msg = MIMEMultipart()
+    msg['From'] = SENDER_EMAIL
+    msg['To'] = recipient
+    msg['Subject'] = subject
+    
+    msg.attach(MIMEText(body_content, 'plain'))
+    
     try:
-        service = build('gmail', 'v1', credentials=creds)
-        message = EmailMessage()
+        print(f"Connecting to SMTP server {SMTP_SERVER}:{SMTP_PORT}...")
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
         
-        full_content = (
-            "Here are the exact, full URLs for your OSINT Command Center:\n\n"
-            "=== NEW MOBILE ACCESS ===\n"
-            "Streamlit Dashboard (Local Wi-Fi): http://192.168.1.121:8501\n"
-            "Streamlit Dashboard (Tailscale): http://100.103.157.60:8501\n\n"
-            "1. The Master GitHub Evidence Repository:\n"
-            "https://github.com/Tonypost949/osint-agent\n\n"
-            "2. The GIS Maps (Viewable via GitHub):\n"
-            "Nationwide Pipeline Map:\n"
-            "https://github.com/Tonypost949/osint-agent/blob/master/nationwide_pipeline_map.html\n"
-            "Local OC / Hexavalent Plume Map:\n"
-            "https://github.com/Tonypost949/osint-agent/blob/master/osint_gemini_gis.html\n\n"
-            "3. The Congressional Briefing Exhibit:\n"
-            "https://github.com/Tonypost949/osint-agent/blob/master/FEDERAL_WHISTLEBLOWER_EXHIBIT.md\n\n"
-            "4. Google Cloud Console for BigQuery Backups:\n"
-            "https://console.cloud.google.com/bigquery?project=project-743aab84-f9a5-4ec7-954&ws=!1m5!1m4!4m3!1sproject-743aab84-f9a5-4ec7-954!2snational_audits!3sdrive_file_index\n\n"
-            "---\n\n"
-            + MERMAID_GRAPH
-        )
+        print("Logging in using secure App Password...")
+        server.login(SENDER_EMAIL, APP_PASSWORD)
         
-        message.set_content(full_content)
-        message['To'] = 'txtdjdrop@gmail.com'
-        message['From'] = 'txtdjdrop@gmail.com'
-        message['Subject'] = 'OSINT Zeus: Vanguard RICO Network Architecture Graph'
+        print(f"Sending email to {recipient}...")
+        server.sendmail(SENDER_EMAIL, recipient, msg.as_string())
+        server.quit()
+        print("[OK] Alert email sent successfully!")
+        return True
+    except Exception as e:
+        print(f"[FAIL] Failed to send email alert: {e}")
+        return False
 
-        encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-        create_message = {'raw': encoded_message}
-
-        send_message = service.users().messages().send(userId="me", body=create_message).execute()
-        print(f"[+] Email successfully sent! Message ID: {send_message['id']}")
-
-    except Exception as error:
-        print(f"[!] An error occurred: {error}")
-
-if __name__ == '__main__':
-    send_email()
+if __name__ == "__main__":
+    # Test alert
+    send_evidence_alert("TEST ALERT: OSINT Automated Mail Active", "Secure connection established using app password.")
